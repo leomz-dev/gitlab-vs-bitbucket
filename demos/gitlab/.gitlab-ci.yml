@@ -1,0 +1,76 @@
+# .gitlab-ci.yml - Pipeline CI/CD de GitLab para NotasApp (demostración)
+# Documentación: https://docs.gitlab.com/ci/yaml/
+
+stages:
+  - build
+  - test
+  - deploy
+
+default:
+  image: python:3.12-slim
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
+
+# Caché compartida entre jobs, invalidada cuando cambia requirements.txt
+cache:
+  key:
+    files:
+      - requirements.txt
+  paths:
+    - .pip-cache/
+
+# ------------------------------- BUILD -------------------------------
+build:
+  stage: build
+  script:
+    - python -m pip install --cache-dir .pip-cache -r requirements.txt
+    - python -m compileall -q src/
+  artifacts:
+    name: "build-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - src/
+    expire_in: 1 week
+
+# -------------------------------- TEST -------------------------------
+test:unitarias:
+  stage: test
+  needs: ["build"]              # DAG: arranca sin esperar otros jobs de 'test'
+  script:
+    - python -m unittest discover -s tests -v
+  artifacts:
+    when: always
+    paths:
+      - tests/
+    expire_in: 3 days
+
+test:estilo:
+  stage: test
+  script:
+    - python -m pip install ruff
+    - ruff check src/
+
+# ------------------------------- DEPLOY ------------------------------
+deploy:staging:
+  stage: deploy
+  needs: ["test:unitarias", "test:estilo"]
+  environment:
+    name: staging
+    url: https://staging.notasapp.example.com
+  script:
+    - python scripts/deploy.py staging
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+deploy:produccion:
+  stage: deploy
+  needs: ["test:unitarias"]
+  environment:
+    name: produccion
+    url: https://notasapp.example.com
+  script:
+    - python scripts/deploy.py produccion
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: manual              # requiere aprobación manual en la interfaz
+    - when: never

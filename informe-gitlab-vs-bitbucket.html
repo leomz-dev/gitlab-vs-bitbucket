@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>GitLab vs Bitbucket - Informe comparativo</title>
+<style>
+  @page { size: A4; margin: 17mm 15mm 18mm 15mm; }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  body {
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 10.2pt;
+    line-height: 1.5;
+    color: #1f2430;
+    margin: 0;
+  }
+
+  /* ---------------- Portada ---------------- */
+  .cover { page-break-after: always; padding-top: 6mm; }
+  .cover-band { display: flex; height: 10mm; border-radius: 3px; overflow: hidden; margin-bottom: 14mm; }
+  .cover-band .gl { flex: 1; background: #fc6d26; }
+  .cover-band .bb { flex: 1; background: #0052cc; }
+  .cover h1 {
+    font-size: 27pt; line-height: 1.18; margin: 0 0 4mm 0; color: #101828; letter-spacing: -0.4px;
+  }
+  .cover h1 .a { color: #fc6d26; }
+  .cover h1 .b { color: #0052cc; }
+  .cover .sub {
+    font-size: 13pt; color: #475467; margin: 0 0 16mm 0; font-weight: 400;
+  }
+  .cover .rule { height: 2px; background: #e4e7ec; margin: 0 0 8mm 0; }
+  .cover-meta { font-size: 10.5pt; }
+  .cover-meta .row { display: flex; margin-bottom: 2.5mm; }
+  .cover-meta .lbl { width: 38mm; color: #667085; }
+  .cover-meta .val { color: #101828; font-weight: 600; }
+  .cover-note {
+    margin-top: 18mm; background: #f9fafb; border: 1px solid #e4e7ec;
+    border-radius: 4px; padding: 5mm; font-size: 9.3pt; color: #475467;
+  }
+
+  /* ---------------- Estructura ---------------- */
+  h1.section {
+    font-size: 17pt; color: #101828; margin: 0 0 5mm 0; padding-bottom: 2mm;
+    border-bottom: 2px solid #101828; page-break-before: always; page-break-after: avoid;
+  }
+  h1.section.nobreak { page-break-before: avoid; }
+  h1.section .num { color: #667085; font-weight: 600; margin-right: 2mm; }
+  h2 { font-size: 12.6pt; color: #101828; margin: 6mm 0 2.5mm 0; page-break-after: avoid; }
+  h3 { font-size: 11pt; color: #344054; margin: 4.5mm 0 2mm 0; page-break-after: avoid; }
+  p { margin: 0 0 2.6mm 0; text-align: justify; }
+  ul, ol { margin: 0 0 3mm 0; padding-left: 6mm; }
+  li { margin-bottom: 1.2mm; }
+  code { font-family: "Consolas", "Courier New", monospace; font-size: 9.1pt; background: #f2f4f7; padding: 0.3mm 1mm; border-radius: 2px; }
+  strong { color: #101828; }
+
+  /* ---------------- Tablas ---------------- */
+  table { width: 100%; border-collapse: collapse; margin: 3mm 0 4mm 0; font-size: 9.1pt; page-break-inside: avoid; }
+  th { background: #101828; color: #fff; text-align: left; padding: 2mm 2.4mm; font-weight: 600; vertical-align: top; }
+  td { border-bottom: 1px solid #e4e7ec; padding: 1.9mm 2.4mm; vertical-align: top; }
+  tbody tr:nth-child(even) td { background: #fafbfc; }
+  table.gl th { background: #fc6d26; }
+  table.bb th { background: #0052cc; }
+  td.crit { color: #475467; font-weight: 600; width: 34%; }
+
+  /* ---------------- Cajas ---------------- */
+  .box { border-radius: 4px; padding: 3.4mm 4mm; margin: 3mm 0 4mm 0; font-size: 9.6pt; page-break-inside: avoid; }
+  .box .t { font-weight: 700; display: block; margin-bottom: 1.4mm; }
+  .box.ok { background: #ecfdf3; border-left: 4px solid #12b76a; }
+  .box.ok .t { color: #027a48; }
+  .box.bad { background: #fef3f2; border-left: 4px solid #f04438; }
+  .box.bad .t { color: #b42318; }
+  .box.info { background: #eff8ff; border-left: 4px solid #2e90fa; }
+  .box.info .t { color: #175cd3; }
+  .box.warn { background: #fffaeb; border-left: 4px solid #f79009; }
+  .box.warn .t { color: #b54708; }
+  .box ul { margin-bottom: 0; }
+
+  /* ---------------- Código y terminal ---------------- */
+  pre.code, pre.term {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 8.1pt; line-height: 1.42; border-radius: 4px;
+    padding: 3mm 3.5mm; margin: 2.5mm 0 4mm 0;
+    white-space: pre-wrap; word-break: break-word;
+    page-break-inside: avoid; overflow-wrap: break-word;
+  }
+  pre.code { background: #f8fafc; border: 1px solid #e4e7ec; border-left: 4px solid #98a2b3; color: #101828; }
+  pre.code.gl { border-left-color: #fc6d26; }
+  pre.code.bb { border-left-color: #0052cc; }
+  pre.term { background: #0f172a; color: #d5dbe7; border-left: 4px solid #12b76a; }
+  pre.term.fail { border-left-color: #f04438; }
+  .cap { font-size: 8.6pt; color: #667085; margin: -2.5mm 0 4mm 0; }
+
+  /* ---------------- Índice ---------------- */
+  .toc { page-break-after: always; }
+  .toc ol { list-style: none; padding-left: 0; font-size: 10.4pt; }
+  .toc li { margin-bottom: 1.9mm; color: #344054; }
+  .toc li .n { display: inline-block; width: 9mm; color: #667085; font-weight: 700; }
+  .toc li.sub { padding-left: 9mm; font-size: 9.4pt; color: #667085; margin-bottom: 1mm; }
+
+  /* ---------------- Diagrama de flujo ---------------- */
+  .flow { display: flex; align-items: stretch; gap: 2mm; margin: 3mm 0 4mm 0; page-break-inside: avoid; }
+  .flow .n {
+    flex: 1; border: 1px solid #d0d5dd; border-radius: 4px; padding: 2.6mm 2mm;
+    font-size: 8.7pt; text-align: center; background: #fff;
+  }
+  .flow .n b { display: block; font-size: 9pt; margin-bottom: 0.8mm; }
+  .flow .arw { align-self: center; color: #98a2b3; font-weight: 700; }
+  .flow.gl .n { border-top: 3px solid #fc6d26; }
+  .flow.bb .n { border-top: 3px solid #0052cc; }
+
+  .cols { display: flex; gap: 4mm; page-break-inside: avoid; }
+  .cols > div { flex: 1; }
+  .small { font-size: 9pt; color: #475467; }
+  .tag { display: inline-block; font-size: 8.2pt; font-weight: 700; padding: 0.5mm 1.6mm; border-radius: 3px; }
+  .tag.gl { background: #fff4ed; color: #c4320a; }
+  .tag.bb { background: #eff8ff; color: #175cd3; }
+  .foot { margin-top: 6mm; padding-top: 3mm; border-top: 1px solid #e4e7ec; font-size: 8.4pt; color: #98a2b3; }
+</style>
+</head>
+<body>
+
+<!-- ============================== PORTADA ============================== -->
+<div class="cover">
+  <div class="cover-band"><div class="gl"></div><div class="bb"></div></div>
+  <h1><span class="a">GitLab</span> vs <span class="b">Bitbucket</span><br>Plataformas en la nube para el versionamiento de software</h1>
+  <p class="sub">Investigación comparativa y demostración práctica mediante dos proyectos equivalentes</p>
+  <div class="rule"></div>
+  <div class="cover-meta">
+    <div class="row"><span class="lbl">Autor</span><span class="val">Leonardo Meza</span></div>
+    <div class="row"><span class="lbl">Programa</span><span class="val">Ingeniería de Sistemas</span></div>
+    <div class="row"><span class="lbl">Institución</span><span class="val">Universidad de la Costa (CUC)</span></div>
+    <div class="row"><span class="lbl">Tema</span><span class="val">Software de versionamiento en la nube</span></div>
+    <div class="row"><span class="lbl">Fecha</span><span class="val">24 de octubre de 2026</span></div>
+  </div>
+  <div class="cover-note">
+    <strong>Alcance del documento.</strong> Este informe describe qué son GitLab y Bitbucket, cómo funcionan
+    internamente, qué características, planes y precios ofrecen, y presenta <strong>dos demostraciones
+    prácticas completas</strong> (una por plataforma) construidas sobre un mismo proyecto de software, con el fin de
+    evidenciar ventajas y desventajas de una frente a la otra. Todos los datos de precios y planes corresponden a
+    la información publicada por los proveedores en octubre de 2026 y pueden variar según región, moneda e impuestos.
+  </div>
+</div>
+
+<!-- ============================== ÍNDICE ============================== -->
+<div class="toc">
+  <h1 class="section nobreak">Índice de contenidos</h1>
+  <ol>
+    <li><span class="n">1.</span> Introducción, objetivos y metodología</li>
+    <li><span class="n">2.</span> Marco conceptual: versionamiento y plataformas en la nube</li>
+    <li><span class="n">3.</span> GitLab</li>
+    <li class="sub">3.1 Qué es · 3.2 Historia y licencia · 3.3 Arquitectura · 3.4 Cómo funciona · 3.5 Características · 3.6 Planes y precios · 3.7 Ventajas y desventajas</li>
+    <li><span class="n">4.</span> Bitbucket</li>
+    <li class="sub">4.1 Qué es · 4.2 Historia y licencia · 4.3 Arquitectura · 4.4 Cómo funciona · 4.5 Características · 4.6 Planes y precios · 4.7 Ventajas y desventajas</li>
+    <li><span class="n">5.</span> Comparación general de las dos plataformas</li>
+    <li><span class="n">6.</span> Ejemplo 1 — Demostración con GitLab</li>
+    <li class="sub">6.1 Descripción · 6.2 Estructura del proyecto · 6.3 El pipeline · 6.4 Flujo ejecutado · 6.5 Evidencias · 6.6 Análisis</li>
+    <li><span class="n">7.</span> Ejemplo 2 — Demostración con Bitbucket</li>
+    <li class="sub">7.1 Descripción · 7.2 Estructura del proyecto · 7.3 Los pipelines · 7.4 Flujo ejecutado · 7.5 Evidencias · 7.6 Análisis</li>
+    <li><span class="n">8.</span> Análisis comparativo de las dos demostraciones</li>
+    <li><span class="n">9.</span> Ventajas y desventajas de una plataforma sobre la otra</li>
+    <li><span class="n">10.</span> Conclusiones y recomendaciones</li>
+    <li><span class="n">11.</span> Referencias y fuentes consultadas</li>
+    <li><span class="n">12.</span> Anexos: archivos entregados y reproducción de la demostración</li>
+  </ol>
+  <div class="box info">
+    <span class="t">Cómo leer las demostraciones</span>
+    Los capítulos 6 y 7 contienen las dos demostraciones. Los bloques de fondo oscuro corresponden a
+    <strong>salidas reales de terminal</strong> obtenidas durante la ejecución; los bloques claros con borde de color
+    corresponden a <strong>archivos de configuración reales</strong> incluidos en la entrega. Cuando se describe una
+    acción que ocurre en la interfaz web de la plataforma (por ejemplo, aprobar un Merge Request), se indica
+    expresamente que es una descripción del flujo y no una captura de pantalla.
+  </div>
+</div>
+
+<!-- ============================== 1 ============================== -->
+<h1 class="section"><span class="num">1.</span> Introducción, objetivos y metodología</h1>
+
+<h2>1.1 Introducción</h2>
+<p>
+El control de versiones es la práctica que permite registrar, recuperar y auditar cada cambio realizado sobre el
+código fuente de un proyecto. Git es hoy el sistema de control de versiones distribuido dominante, pero Git por sí
+solo no resuelve dónde se aloja el repositorio, quién puede modificarlo, cómo se revisan los cambios ni cómo se
+prueban y despliegan automáticamente. De esa necesidad surgen las <strong>plataformas de versionamiento en la
+nube</strong>, entre las que destacan GitHub, GitLab y Bitbucket.
+</p>
+<p>
+Este informe se concentra en las dos últimas. Aunque ambas alojan repositorios Git y ofrecen revisión de código y
+pipelines de integración continua, responden a filosofías muy distintas: GitLab se concibe como una
+<strong>plataforma DevOps integral</strong> que puede sustituir a varias herramientas y autoalojarse con paridad de
+funciones, mientras que Bitbucket es un <strong>servicio de alojamiento de repositorios</strong> profundamente
+integrado con el ecosistema de Atlassian (Jira, Confluence, Compass).
+</p>
+
+<h2>1.2 Objetivos</h2>
+<p><strong>Objetivo general.</strong> Investigar y comparar las plataformas GitLab y Bitbucket, y demostrar
+mediante ejemplos prácticos sus ventajas y desventajas relativas.</p>
+<p><strong>Objetivos específicos.</strong></p>
+<ul>
+  <li>Definir qué es cada plataforma, su origen, su modelo de licenciamiento y su arquitectura de funcionamiento.</li>
+  <li>Identificar las características principales de cada una, así como sus planes y precios vigentes.</li>
+  <li>Construir un proyecto de software de prueba y ejecutarlo dos veces: una con el flujo de trabajo y el pipeline
+      de GitLab y otra con el de Bitbucket, manteniendo constante el código de la aplicación.</li>
+  <li>Documentar las salidas reales de las ejecuciones como evidencia.</li>
+  <li>Contrastar los resultados y formular recomendaciones de elección según el contexto de uso.</li>
+</ul>
+
+<h2>1.3 Metodología</h2>
+<p>La investigación combinó tres actividades:</p>
+<ol>
+  <li><strong>Revisión documental y de fuentes web oficiales</strong> (documentación técnica de GitLab y de
+      Atlassian, páginas de precios, manual del producto y análisis de terceros de 2026), realizada el 24 de octubre
+      de 2026. Las cifras de precios se contrastaron entre páginas oficiales, detectándose inconsistencias que se
+      señalan en el capítulo correspondiente.</li>
+  <li><strong>Construcción de un proyecto de software común.</strong> Se desarrolló <em>NotasApp</em>, un módulo
+      Python de cálculo de notas académicas con validaciones, encapsulamiento y una batería de 16 pruebas unitarias
+      ejecutables sin dependencias externas. El mismo código se utilizó en las dos demostraciones, de modo que
+      cualquier diferencia observada provenga de la plataforma y no de la aplicación.</li>
+  <li><strong>Ejecución de dos flujos de trabajo completos</strong> (uno por plataforma) sobre repositorios Git
+      reales: rama corta de trabajo, confirmaciones, detección de un error por las pruebas automatizadas, corrección,
+      fusión con <em>commit</em> de integración, etiquetado de versión y publicación en un servidor remoto. En cada
+      caso se incluyó el archivo de configuración de CI/CD propio de la plataforma (<code>.gitlab-ci.yml</code> y
+      <code>bitbucket-pipelines.yml</code>) y se verificó su validez sintáctica.</li>
+</ol>
+
+<div class="box warn">
+  <span class="t">Limitación declarada de la demostración</span>
+  El entorno de trabajo utilizado para elaborar este informe <strong>no disponía de cuentas en GitLab.com ni en
+  Bitbucket.org</strong>. Por lo tanto, las demostraciones se ejecutaron sobre repositorios Git locales que
+  <em>replican</em> fielmente el flujo de trabajo de cada plataforma (ramas, <em>commits</em> convencionales,
+  fusiones con <code>--no-ff</code> equivalentes al Merge Request / Pull Request, etiquetas y <em>push</em> a un
+  servidor remoto simulado). Los archivos de configuración de CI/CD son reales y están listos para ser utilizados en
+  la plataforma: su sintaxis fue validada con un analizador YAML, y los pasos que el pipeline ejecutaría se
+  corrieron localmente con los mismos comandos, obteniéndose las salidas que se muestran como evidencia. Las
+  funciones que solo existen en la interfaz web (aprobaciones, tableros, informes visuales) se describen como parte
+  del funcionamiento de la plataforma y se identifican como tales.
+</div>
+
+<!-- ============================== 2 ============================== -->
+<h1 class="section"><span class="num">2.</span> Marco conceptual: versionamiento y plataformas en la nube</h1>
+
+<h2>2.1 Control de versiones y Git</h2>
+<p>
+Un <strong>sistema de control de versiones (VCS)</strong> registra la evolución de un conjunto de archivos a lo
+largo del tiempo. Git, creado por Linus Torvalds en 2005, es un VCS <strong>distribuido</strong>: cada copia del
+repositorio contiene el historial completo, y las operaciones de confirmación y consulta de historial se realizan
+localmente. La colaboración se logra sincronizando repositorios mediante <em>push</em> y <em>pull</em>.
+</p>
+<p>Los conceptos que se usarán en las demostraciones son:</p>
+<ul>
+  <li><strong>Repositorio:</strong> base de datos de objetos que contiene el historial.</li>
+  <li><strong>Commit:</strong> instantánea inmutable del proyecto, identificada por un <em>hash</em> SHA-1/SHA-256,
+      con autor, fecha y mensaje.</li>
+  <li><strong>Rama (<em>branch</em>):</strong> puntero móvil a un <em>commit</em>; permite líneas de trabajo paralelas.</li>
+  <li><strong>Remoto:</strong> copia del repositorio alojada en un servidor (GitLab.com, Bitbucket.org, etc.).</li>
+  <li><strong>Etiqueta (<em>tag</em>):</strong> marca fija de una versión, por ejemplo <code>v1.0.0</code>.</li>
+</ul>
+
+<h2>2.2 Qué aporta una plataforma en la nube</h2>
+<p>Git por sí solo no resuelve la colaboración a escala. Las plataformas en la nube añaden:</p>
+<table>
+  <thead><tr><th style="width:30%">Capacidad</th><th>Descripción</th></tr></thead>
+  <tbody>
+    <tr><td class="crit">Alojamiento remoto</td><td>Servidor siempre disponible con respaldo, control de acceso y alta disponibilidad.</td></tr>
+    <tr><td class="crit">Revisión de código</td><td><em>Merge Requests</em> (GitLab) y <em>Pull Requests</em> (Bitbucket): propuesta de cambios con discusión en línea, aprobaciones y fusión controlada.</td></tr>
+    <tr><td class="crit">Protección de ramas</td><td>Reglas que impiden escribir directamente en ramas estables y exigen revisiones y comprobaciones previas.</td></tr>
+    <tr><td class="crit">CI/CD</td><td>Ejecución automática de compilación, pruebas y despliegue definida como código.</td></tr>
+    <tr><td class="crit">Trazabilidad</td><td>Historial auditable de quién cambió qué, cuándo y con qué resultado.</td></tr>
+    <tr><td class="crit">Gestión de trabajo</td><td>Incidencias, tableros y su vínculo con las confirmaciones de código.</td></tr>
+  </tbody>
+</table>
+
+<h2>2.3 Flujos de trabajo más comunes</h2>
+<table>
+  <thead><tr><th style="width:26%">Flujo</th><th>Idea central</th><th style="width:26%">Plataforma donde encaja mejor</th></tr></thead>
+  <tbody>
+    <tr><td class="crit">Git Flow</td><td>Ramas de larga vida: <code>main</code>, <code>develop</code>, <code>release/*</code>, <code>hotfix/*</code>. Publicaciones planificadas.</td><td>Ambas, con más ceremonia</td></tr>
+    <tr><td class="crit">GitLab Flow</td><td>Ramas de entorno (<code>main</code> → <code>staging</code> → <code>production</code>); el código asciende por fusión entre ramas.</td><td>GitLab (nativo)</td></tr>
+    <tr><td class="crit">Ramas cortas por funcionalidad</td><td>Una rama por tarea que vive pocos días y se fusiona mediante MR/PR revisado. Es el flujo usado en este informe.</td><td>Ambas</td></tr>
+    <tr><td class="crit">Trunk-based</td><td>Integración muy frecuente en la rama principal, con pruebas automatizadas como red de seguridad (requiere buen CI).</td><td>GitLab (mejor soporte con <em>merge trains</em>)</td></tr>
+    <tr><td class="crit">Basado en <em>fork</em></td><td>Cada contribuyente copia el repositorio y propone cambios al original. Común en proyectos abiertos.</td><td>Ambas</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================== 3 ============================== -->
+<h1 class="section"><span class="num">3.</span> <span class="tag gl">GitLab</span></h1>
+
+<h2>3.1 Qué es GitLab</h2>
+<p>
+<strong>GitLab</strong> es una plataforma de DevOps que reúne en una sola aplicación el control de versiones Git,
+la integración y entrega continua (CI/CD), el registro de contenedores y paquetes, el análisis de seguridad, la
+gestión de incidencias y tableros, la documentación (<em>wiki</em>) y el alojamiento de sitios estáticos. Su
+propuesta de valor es <strong>sustituir una cadena de herramientas por una única plataforma</strong>, evitando
+integraciones externas y manteniendo una sola interfaz, un solo modelo de permisos y un solo historial de auditoría.
+</p>
+<table class="gl">
+  <thead><tr><th style="width:32%">Aspecto</th><th>Detalle</th></tr></thead>
+  <tbody>
+    <tr><td class="crit">Empresa</td><td>GitLab Inc. (empresa pública, cotiza en NASDAQ con el símbolo GTLB).</td></tr>
+    <tr><td class="crit">Origen</td><td>Proyecto iniciado en 2011 por Dmitriy Zaporozhets y Valery Sizov; la empresa se funda en 2014 con Sid Sijbrandij como cofundador.</td></tr>
+    <tr><td class="crit">Licencia</td><td>Modelo <em>open core</em>: <strong>Community Edition (CE) bajo licencia MIT</strong> y <strong>Enterprise Edition (EE) bajo licencia propietaria</strong> (código visible, uso restringido).</td></tr>
+    <tr><td class="crit">Formas de uso</td><td>GitLab.com (SaaS), <strong>Self-Managed</strong> (autoalojado con paridad funcional, incluso en redes aisladas) y GitLab Dedicated (SaaS de un solo inquilino).</td></tr>
+    <tr><td class="crit">Implementación</td><td>Ruby on Rails para la aplicación principal; Go para los componentes de alto rendimiento (Gitaly, Runner, Workhorse, Shell, Pages); Vue.js en el frontend; PostgreSQL y Redis como almacenes de datos.</td></tr>
+    <tr><td class="crit">Cuota de mercado SCM</td><td>Aproximadamente 16 % (frente al 68 % de GitHub y el 4 % de Bitbucket, según estimaciones de 2026).</td></tr>
+  </tbody>
+</table>
+
+<h2>3.2 Arquitectura y componentes</h2>
+<p>
+GitLab no es un único programa: es un conjunto de servicios que se despliegan juntos (paquete Omnibus, contenedor
+Docker o gráficos de Helm sobre Kubernetes). Los componentes principales son:
+</p>
+<table>
+  <thead><tr><th style="width:26%">Componente</th><th>Función</th><th style="width:12%">Tecnología</th></tr></thead>
+  <tbody>
+    <tr><td class="crit">Puma (Webservice)</td><td>Atiende las peticiones web y de API de la aplicación Rails.</td><td>Ruby</td></tr>
+    <tr><td class="crit">Workhorse</td><td>Proxy inteligente que descarga tráfico pesado (Git por HTTP, archivos, sondeo largo).</td><td>Go</td></tr>
+    <tr><td class="crit">Gitaly</td><td>Servicio RPC que centraliza el acceso de lectura y escritura a los repositorios Git. Presente en toda instalación.</td><td>Go</td></tr>
+    <tr><td class="crit">Gitaly Cluster</td><td>Réplica de Gitaly con <em>failover</em> automático y consistencia fuerte (componente Praefect).</td><td>Go</td></tr>
+    <tr><td class="crit">Sidekiq</td><td>Procesamiento de tareas en segundo plano (colas sobre Redis).</td><td>Ruby</td></tr>
+    <tr><td class="crit">PostgreSQL / Redis</td><td>Base de datos principal y almacén de caché, colas y mensajería.</td><td>—</td></tr>
+    <tr><td class="crit">GitLab Shell</td><td>Gestión del acceso Git por SSH y del control de permisos.</td><td>Go</td></tr>
+    <tr><td class="crit">GitLab Runner</td><td>Agente que ejecuta los <em>jobs</em> del pipeline. Binario único; se registra contra el servidor.</td><td>Go</td></tr>
+    <tr><td class="crit">Registries</td><td>Registro de imágenes de contenedor y de paquetes (npm, Maven, PyPI, NuGet, Go…).</td><td>—</td></tr>
+    <tr><td class="crit">GitLab Pages</td><td>Publicación de sitios estáticos desde el propio repositorio.</td><td>Go</td></tr>
+  </tbody>
+</table>
+<p>
+El <strong>Runner</strong> merece atención porque es quien ejecuta el pipeline. Admite varios ejecutores:
+<em>shell</em> (rápido, sin aislamiento), <em>docker</em> (aislamiento por contenedor, el estándar),
+<em>kubernetes</em> (un pod por <em>job</em>, con escalado elástico), <em>docker-autoscaler</em> e
+<em>instance</em>. Un punto económicamente relevante: los <em>runners</em> autoalojados
+<strong>no consumen los minutos de cómputo</strong> de la suscripción.
+</p>
+
+<h2>3.3 Cómo funciona GitLab</h2>
+<p>El ciclo de trabajo típico sobre GitLab es el siguiente:</p>
+<div class="flow gl">
+  <div class="n"><b>1. Rama</b>Se crea una rama corta desde <code>main</code></div>
+  <div class="arw">→</div>
+  <div class="n"><b>2. Push</b>Se publica la rama en el remoto</div>
+  <div class="arw">→</div>
+  <div class="n"><b>3. Merge Request</b>Se abre el MR; el pipeline se dispara solo</div>
+  <div class="arw">→</div>
+  <div class="n"><b>4. Revisión</b>Aprobaciones, comentarios y reglas obligatorias</div>
+  <div class="arw">→</div>
+  <div class="n"><b>5. Fusión</b>Merge a <code>main</code> con el pipeline en verde</div>
+  <div class="arw">→</div>
+  <div class="n"><b>6. Despliegue</b>Entornos y etiqueta de versión</div>
+</div>
+<ul>
+  <li><strong>Merge Requests (MR).</strong> Cada propuesta de cambio se discute en línea: comentarios por línea de
+      código, sugerencias aplicables, hilos resueltos y aprobaciones. Se pueden exigir aprobaciones por rol o por
+      propietario de código (<code>CODEOWNERS</code>, en Premium y Ultimate) y aplicar <em>merge trains</em> para
+      serializar integraciones sin romper la rama principal.</li>
+  <li><strong>Pipelines.</strong> Se declaran en el archivo <code>.gitlab-ci.yml</code> de la raíz del repositorio.
+      Se organizan en etapas (<code>stages</code>) y <em>jobs</em>. Incluyen funciones avanzadas como el grafo de
+      dependencias <code>needs</code> (permite que un <em>job</em> no espere a toda su etapa), la inclusión de
+      plantillas compartidas (<code>include</code>, <code>extends</code>), <em>pipelines</em> padre‑hijo y
+      <em>pipelines</em> multicitados entre proyectos.</li>
+  <li><strong>Permisos y ramas protegidas.</strong> Los roles de proyecto son Guest, Reporter, Developer, Maintainer
+      y Owner. Las ramas protegidas definen quién puede hacer <em>push</em>, <em>force push</em> o fusionar.</li>
+  <li><strong>Push options.</strong> Desde la consola se puede pedir la creación del MR:
+      <code>git push -o merge_request.create -o merge_request.target=main origin feature/login</code>. Es una
+      capacidad exclusiva de GitLab entre las dos plataformas comparadas.</li>
+</ul>
+
+<h2>3.4 Características principales</h2>
+<table>
+  <thead><tr><th style="width:26%">Área</th><th>Características</th></tr></thead>
+  <tbody>
+    <tr><td class="crit">Repositorios y revisión</td><td>Repositorios privados ilimitados, Merge Requests con aprobaciones, sugerencias aplicables, <em>merge trains</em>, ramas protegidas, búsqueda avanzada de código.</td></tr>
+    <tr><td class="crit">CI/CD</td><td>Pipelines en YAML con <code>stages</code>, <code>rules</code>, <code>needs</code>, caché, artefactos, entornos y despliegues manuales, revisión de aplicaciones (<em>Review Apps</em>), Auto DevOps.</td></tr>
+    <tr><td class="crit">Registros</td><td>Container Registry y Package Registry integrados por proyecto.</td></tr>
+    <tr><td class="crit">Seguridad (DevSecOps)</td><td>SAST, DAST, escaneo de dependencias, de contenedores, de secretos y de infraestructura como código, gestión de vulnerabilidades y cumplimiento normativo (suite completa en Ultimate).</td></tr>
+    <tr><td class="crit">Gestión del trabajo</td><td>Incidencias, tableros, etiquetas, hitos, épicas y hojas de ruta.</td></tr>
+    <tr><td class="crit">Documentación y publicación</td><td>Wiki integrada, GitLab Pages, entornos de despliegue con URL e historial de reversión.</td></tr>
+    <tr><td class="crit">Inteligencia artificial</td><td>GitLab Duo (asistente y agentes) basado en consumo de «GitLab Credits».</td></tr>
+    <tr><td class="crit">Integraciones</td><td>Jira (menos profunda que la de Bitbucket), Slack, Mattermost, Kubernetes, Terraform, nubes públicas.</td></tr>
+  </tbody>
+</table>
+
+<h2>3.5 Planes y precios</h2>
+<table class="gl">
+  <thead><tr><th style="width:24%">Característica</th><th>Free</th><th>Premium</th><th>Ultimate</th></tr></thead>
+  <tbody>
+    <tr><td class="crit">Precio</td><td>0 USD</td><td>29 USD / usuario / mes (contrato anual)</td><td>Precio personalizado (se cotiza con el proveedor)</td></tr>
+    <tr><td class="crit">Usuarios</td><td>5 en el grupo de nivel superior</td><td>Ilimitados</td><td>Ilimitados</td></tr>
+    <tr><td class="crit">Minutos de cómputo al mes</td><td>400</td><td>10 000</td><td>50 000</td></tr>
+    <tr><td class="crit">Almacenamiento</td><td>10 GiB</td><td>500 GiB</td><td>500 GiB</td></tr>
+    <tr><td class="crit">Seguridad</td><td>SAST y detección de secretos limitados</td><td>Controles de revisión adicionales</td><td>Suite completa de seguridad y cumplimiento</td></tr>
+    <tr><td class="crit">Soporte</td><td>Comunidad</td><td>Soporte prioritario</td><td>Soporte prioritario y asesoría</td></tr>
+  </tbody>
+</table>
+<p class="small">
+Complementos: minutos adicionales a 10 USD por cada 1 000; almacenamiento adicional a 5 USD por 10 GiB al mes;
+créditos de GitLab Duo a 1 USD por crédito; planificación ágil empresarial a 15 USD por usuario al mes. En
+instalaciones autoalojadas (Self‑Managed) el nivel Free no tiene el límite de 5 usuarios, y los
+<em>runners</em> propios no consumen minutos.
+</p>
+
+<h2>3.6 Ventajas y desventajas de GitLab</h2>
+<div class="cols">
+  <div>
+    <div class="box ok">
+      <span class="t">Ventajas</span>
+      <ul>
+        <li><strong>Plataforma única:</strong> repositorios, CI/CD, registros, seguridad y gestión del trabajo en un solo lugar; menos herramientas que integrar.</li>
+        <li><strong>CI/CD maduro:</strong> dependencias entre <em>jobs</em> (paralelismo), inclusión de plantillas compartidas, <em>merge trains</em> y <em>pipelines</em> padre‑hijo.</li>
+        <li><strong>Autoalojamiento con paridad:</strong> la versión autoalojada ofrece las mismas funciones que la nube, incluso en redes aisladas; clave para soberanía de datos.</li>
+        <li><strong>Seguridad integrada:</strong> análisis estático y dinámico, dependencias y contenedores sin herramientas de terceros.</li>
+        <li><strong>Registros incluidos:</strong> imágenes y paquetes por proyecto.</li>
+        <li><strong>Código abierto (CE, MIT):</strong> permite auditar y autoalojar gratuitamente.</li>
+        <li><strong>Control de aprobaciones:</strong> reglas por propietario de código y políticas obligatorias.</li>
+      </ul>
+    </div>
+  </div>
+  <div>
+    <div class="box bad">
+      <span class="t">Desventajas</span>
+      <ul>
+        <li><strong>Curva de aprendizaje alta:</strong> interfaz densa y muchos conceptos (etapas, entornos, reglas, agentes).</li>
+        <li><strong>Coste:</strong> el plan Premium (29 USD) es ocho veces más caro por usuario que el Standard de Bitbucket.</li>
+        <li><strong>Consumo de recursos:</strong> el autoalojado exige bastante memoria y mantenimiento especializado.</li>
+        <li><strong>Nivel gratuito limitado en la nube:</strong> 5 usuarios por grupo y solo 400 minutos de cómputo al mes.</li>
+        <li><strong>Rendimiento percibido:</strong> la interfaz puede resultar más pesada que la de plataformas más simples.</li>
+        <li><strong>Integración con Jira menos profunda</strong> que la nativa de Bitbucket.</li>
+        <li><strong>Funciones de IA facturables por créditos</strong>, con coste variable.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== 4 ============================== -->
+<h1 class="section"><span class="num">4.</span> <span class="tag bb">Bitbucket</span></h1>
+
+<h2>4.1 Qué es Bitbucket</h2>
+<p>
+<strong>Bitbucket</strong> es el servicio de alojamiento de repositorios Git de Atlassian. Su diferencial no es
+competir en comunidad ni en amplitud de funciones, sino <strong>conectar el código con el resto del ecosistema
+Atlassian</strong>: las incidencias viven en Jira, la documentación en Confluence y el seguimiento de despliegues
+se refleja automáticamente en ambos. Está orientado a equipos corporativos que ya utilizan esas herramientas.
+</p>
+<table class="bb">
+  <thead><tr><th style="width:32%">Aspecto</th><th>Detalle</th></tr></thead>
+  <tbody>
+    <tr><td class="crit">Empresa</td><td>Atlassian (NASDAQ: TEAM).</td></tr>
+    <tr><td class="crit">Origen</td><td>Creado en 2008 por Jesper Nøhr, inicialmente centrado en Mercurial; adquirido por Atlassian en septiembre de 2010. El soporte de Mercurial finalizó el 1 de julio de 2020, por lo que hoy es exclusivamente Git.</td></tr>
+    <tr><td class="crit">Licencia</td><td>Propietaria. El servicio en la nube es cerrado; la versión autoalojada (Data Center) requiere licencia comercial.</td></tr>
+    <tr><td class="crit">Formas de uso</td><td><strong>Bitbucket Cloud</strong> (SaaS gestionado por Atlassian) y <strong>Bitbucket Data Center</strong> (autoalojado, con clúster activo‑activo).</td></tr>
+    <tr><td class="crit">Implementación</td><td>La nube es una plataforma SaaS cerrada de Atlassian (originalmente escrita en Python/Django y hoy sobre la plataforma Java de Atlassian); Data Center es un producto Java con clúster sobre Hazelcast.</td></tr>
+    <tr><td class="crit">Cuota de mercado SCM</td><td>Alrededor del 4 %.</td></tr>
+  </tbody>
+</table>
+
+<h2>4.2 Arquitectura y componentes</h2>
+<table>
+  <thead><tr><th style="width:26%">Componente</th><th>Función</th></tr></thead>
+  <tbody>
+    <tr><td class="crit">Espacios de trabajo</td><td>Organización jerárquica <em>workspace</em> → proyectos → repositorios, con permisos en cada nivel.</td></tr>
+    <tr><td class="crit">Bitbucket Pipelines</td><td>Motor de CI/CD definido en <code>bitbucket-pipelines.yml</code>. Cada <em>step</em> se ejecuta en una imagen Docker.</td></tr>
+    <tr><td class="crit">Runners</td><td>Alojados por Atlassian (autoescalado) o autoalojados tras el cortafuegos. Se licencian por <em>slots</em> de compilación concurrentes.</td></tr>
+    <tr><td class="crit">Pipes</td><td>Componentes reutilizables del mercado de Atlassian para pasos frecuentes (despliegues, notificaciones, análisis).</td></tr>
+    <tr><td class="crit">Code Insights</td><td>Integración de resultados de herramientas externas (pruebas, cobertura, análisis de seguridad) dentro del Pull Request.</td></tr>
+    <tr><td class="crit">Entornos de despliegue</td><td>Seguimiento de despliegues por entorno, con permisos específicos en el plan Premium.</td></tr>
+    <tr><td class="crit">Atlassian Guard</td><td>Autenticación única y auditoría, con suscripción independiente.</td></tr>
+    <tr><td class="crit">Data Center</td><td>Clúster activo‑activo con alta disponibilidad para instalaciones propias.</td></tr>
+  </tbody>
+</table>
+<p>
+A diferencia de GitLab, Bitbucket <strong>no incluye de forma nativa</strong> registro completo de contenedores y
+paquetes, ni analizadores de seguridad propios: para esas funciones se recurre a Pipes de terceros (por ejemplo
+Snyk o SonarQube) o a servicios externos.
+</p>
+
+<h2>4.3 Cómo funciona Bitbucket</h2>
+<div class="flow bb">
+  <div class="n"><b>1. Rama</b>Se crea una rama corta desde <code>main</code></div>
+  <div class="arw">→</div>
+  <div class="n"><b>2. Push</b>Se publica la rama en el remoto</div>
+  <div class="arw">→</div>
+  <div class="n"><b>3. Pull Request</b>El PR se crea desde la interfaz web</div>
+  <div class="arw">→</div>
+  <div class="n"><b>4. Merge checks</b>Mínimo de revisores y build correcto</div>
+  <div class="arw">→</div>
+  <div class="n"><b>5. Fusión</b>Merge a <code>main</code></div>
+  <div class="arw">→</div>
+  <div class="n"><b>6. Despliegue</b>Steps por entorno con disparo manual</div>
+</div>
+<ul>
+  <li><strong>Pull Requests (PR).</strong> Revisión en línea con comentarios, <em>tareas</em> pendientes,
+      revisores por defecto y comprobaciones de fusión (<em>merge checks</em>). En el plan Free y Standard las
+      comprobaciones son recomendaciones; en Premium pueden hacerse obligatorias.</li>
+  <li><strong>Pipelines.</strong> El archivo <code>bitbucket-pipelines.yml</code> define secciones
+      <code>default</code>, <code>branches</code>, <code>pull-requests</code> y <code>tags</code>, cada una con una
+      <strong>lista secuencial de <em>steps</em></strong>. Los <em>steps</em> reutilizables se declaran en
+      <code>definitions</code> mediante anclas YAML (<code>&amp;nombre</code> / <code>*nombre</code>). No existe
+      dependencia selectiva entre <em>steps</em> ni inclusión de archivos externos.</li>
+  <li><strong>Permisos.</strong> Se definen a nivel de espacio de trabajo, proyecto, repositorio, rama y entorno,
+      con restricciones de rama y revisores por defecto.</li>
+  <li><strong>Autenticación.</strong> Las contraseñas de cuenta y las <em>app passwords</em> fueron retiradas:
+      desde el 28 de julio de 2026 el acceso por HTTPS exige <strong>API tokens con permisos específicos</strong> o
+      <em>access tokens</em>; también se admite SSH.</li>
+</ul>
+
+<div class="box warn">
+  <span class="t">Cambios disruptivos de Bitbucket en 2026</span>
+  <ul>
+    <li><strong>Issues y Wikis nativos retirados:</strong> los datos se eliminaron a mediados de agosto de 2026; Atlassian dirige a Jira para las incidencias y a Confluence para la documentación. Bitbucket deja de ser una solución autosuficiente de planificación.</li>
+    <li><strong>App passwords eliminados (28 de julio de 2026):</strong> toda automatización que usaba contraseñas de aplicación debe migrarse a API tokens con permisos.</li>
+  </ul>
+</div>
+
+<h2>4.4 Características principales</h2>
+<table>
+  <thead><tr><th style="width:26%">Área</th><th>Características</th></tr></thead>
+  <tbody>
+    <tr><td class="crit">Repositorios y revisión</td><td>Repositorios privados ilimitados, Pull Requests con tareas y revisores por defecto, restricciones de rama, comprobaciones de fusión, descripciones de PR generadas con inteligencia artificial.</td></tr>
+    <tr><td class="crit">CI/CD</td><td>Bitbucket Pipelines con secciones por evento, <em>steps</em> reutilizables, cachés, artefactos, entornos de despliegue y disparos manuales.</td></tr>
+    <tr><td class="crit">Extensibilidad</td><td>Más de un centenar de aplicaciones conectadas y Pipes del mercado (Snyk, SonarQube, despliegues a AWS/Azure…).</td></tr>
+    <tr><td class="crit">Integración Atlassian</td><td>Jira (enlaces automáticos entre commits y tareas, «smart commits», transiciones de estado), Confluence, Trello, Compass y el seguimiento de despliegues.</td></tr>
+    <tr><td class="crit">Seguridad</td><td>Sin análisis propio; listas de IP permitidas, doble factor obligatorio, commits firmados y permisos de despliegue en Premium, más Atlassian Guard.</td></tr>
+    <tr><td class="crit">Registros</td><td>Bitbucket Packages, más limitado que el de GitLab.</td></tr>
+    <tr><td class="crit">Sitios estáticos</td><td>No ofrece un servicio equivalente a GitLab Pages.</td></tr>
+  </tbody>
+</table>
+
+<h2>4.5 Planes y precios</h2>
+<table class="bb">
+  <thead><tr><th style="width:26%">Característica</th><th>Free</th><th>Standard</th><th>Premium</th></tr></thead>
+  <tbody>
+    <tr><td class="crit">Precio</td><td>0 USD</td><td>3,65 USD / usuario / mes</td><td>7,25 USD / usuario / mes</td></tr>
+    <tr><td class="crit">Usuarios</td><td>Hasta 5</td><td>Ilimitados</td><td>Ilimitados</td></tr>
+    <tr><td class="crit">Minutos de compilación al mes</td><td>50</td><td>2 500</td><td>3 500</td></tr>
+    <tr><td class="crit">Almacenamiento de archivos grandes (LFS)</td><td>1 GB</td><td>5 GB</td><td>10 GB</td></tr>
+    <tr><td class="crit">Comprobaciones de fusión</td><td>Recomendadas</td><td>Recomendadas</td><td><strong>Obligatorias</strong></td></tr>
+    <tr><td class="crit">Seguridad de red</td><td>—</td><td>—</td><td>Listas de IP y doble factor obligatorio</td></tr>
+    <tr><td class="crit">Code Insights</td><td>3 integraciones</td><td>3 integraciones</td><td>Ilimitadas</td></tr>
+    <tr><td class="crit">Soporte</td><td>Comunidad</td><td>Estándar</td><td>Premium con acuerdo de nivel de servicio</td></tr>
+  </tbody>
+</table>
+<p class="small">
+Complementos: minutos adicionales a 10 USD por cada 1 000 al mes; 100 GB adicionales de LFS por 10 USD al mes;
+almacenamiento excedente a 0,35 USD por GB al mes. Nota de verificación: durante la investigación la página
+<code>bitbucket.org/product/pricing</code> mostró 3,65 / 7,25 USD por usuario, mientras que
+<code>atlassian.com/software/bitbucket/pricing</code> llegó a mostrar 8,00 USD para Premium y varios análisis
+citaban 3,00 / 6,00 USD. Se recomienda confirmar el valor vigente antes de presupuestar.
+</p>
+
+<h2>4.6 Ventajas y desventajas de Bitbucket</h2>
+<div class="cols">
+  <div>
+    <div class="box ok">
+      <span class="t">Ventajas</span>
+      <ul>
+        <li><strong>Integración nativa con Jira y Confluence:</strong> enlaces automáticos, cambios de estado y seguimiento de despliegues.</li>
+        <li><strong>Precio competitivo:</strong> 3,65 USD por usuario en Standard, el más bajo de los planes de pago analizados.</li>
+        <li><strong>Curva de aprendizaje baja:</strong> configuración simple y revisión muy directa.</li>
+        <li><strong>Nivel gratuito útil:</strong> repositorios privados ilimitados para equipos de hasta 5 personas.</li>
+        <li><strong>DATA Center con clúster activo‑activo</strong> para alta disponibilidad autoalojada.</li>
+        <li><strong>Controles empresariales accesibles</strong> en Premium: IP permitidas, doble factor obligatorio, comprobaciones de fusión forzosas.</li>
+        <li><strong>Ecosistema de Pipes</strong> que cubre funciones no nativas.</li>
+      </ul>
+    </div>
+  </div>
+  <div>
+    <div class="box bad">
+      <span class="t">Desventajas</span>
+      <ul>
+        <li><strong>CI/CD menos potente:</strong> sin dependencias selectivas, sin plantillas compartidas y sin <em>merge trains</em>; ejecución estrictamente secuencial.</li>
+        <li><strong>Sin seguridad nativa:</strong> depende de herramientas externas.</li>
+        <li><strong>Sin registro completo</strong> de contenedores y paquetes.</li>
+        <li><strong>Dependencia del ecosistema Atlassian:</strong> sin Jira y Confluence la plataforma pierde buena parte de su valor.</li>
+        <li><strong>Retiro de Issues y Wikis (2026):</strong> obliga a migrar y a pagar otras herramientas.</li>
+        <li><strong>Nivel gratuito muy limitado en CI/CD:</strong> solo 50 minutos de compilación al mes.</li>
+        <li><strong>Menor paridad</strong> entre la nube y la versión autoalojada.</li>
+        <li><strong>Sin alojamiento de sitios estáticos</strong> ni funciones de IA tan amplias como las de la competencia.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== 5 ============================== -->
+<h1 class="section"><span class="num">5.</span> Comparación general de las dos plataformas</h1>
+<table>
+  <thead><tr><th style="width:22%">Criterio</th><th style="width:39%">GitLab</th><th>Bitbucket</th></tr></thead>
+  <tbody>
+    <tr><td class="crit">Enfoque</td><td>Plataforma DevOps integral</td><td>Alojamiento Git integrado con Atlassian</td></tr>
+    <tr><td class="crit">Empresa / licencia</td><td>GitLab Inc. — <em>open core</em> (CE MIT, EE propietaria)</td><td>Atlassian — propietaria</td></tr>
+    <tr><td class="crit">Precio de entrada de pago</td><td>29 USD / usuario / mes (Premium)</td><td>3,65 USD / usuario / mes (Standard)</td></tr>
+    <tr><td class="crit">Nivel gratuito</td><td>5 usuarios, 400 minutos de cómputo, 10 GiB</td><td>5 usuarios, 50 minutos de compilación, 1 GB de LFS</td></tr>
+    <tr><td class="crit">CI/CD</td><td>Muy completo: etapas, dependencias, plantillas, <em>merge trains</em></td><td>Sencillo: listas de <em>steps</em> por tipo de evento</td></tr>
+    <tr><td class="crit">Registros de contenedores y paquetes</td><td>Integrados y completos</td><td>Limitados</td></tr>
+    <tr><td class="crit">Seguridad integrada</td><td>Sí (suite completa en Ultimate)</td><td>No nativa; mediante Pipes de terceros</td></tr>
+    <tr><td class="crit">Integraciones</td><td>Amplias pero genéricas; Jira menos profunda</td><td>Excelente dentro de Atlassian; limitada fuera</td></tr>
+    <tr><td class="crit">Autoalojado</td><td>Paridad funcional total, incluso en red aislada</td><td>Data Center con clúster, menor paridad</td></tr>
+    <tr><td class="crit">Gestión del trabajo</td><td>Incidencias, tableros y épicas incluidos</td><td>Depende de Jira (Issues y Wikis retirados en 2026)</td></tr>
+    <tr><td class="crit">Facilidad de uso</td><td>Curva alta, interfaz densa</td><td>Curva baja, interfaz simple</td></tr>
+    <tr><td class="crit">Escalabilidad</td><td>Muy alta (Gitaly Cluster, híbrido nativo en la nube)</td><td>Buena en la nube; clúster en Data Center</td></tr>
+    <tr><td class="crit">Sitios estáticos</td><td>GitLab Pages</td><td>No disponible</td></tr>
+    <tr><td class="crit">Autenticación por HTTPS</td><td>Personal Access Token o SSH</td><td>API token obligatorio (app passwords retirados en julio de 2026)</td></tr>
+    <tr><td class="crit">Cuota de mercado SCM</td><td>≈ 16 %</td><td>≈ 4 %</td></tr>
+  </tbody>
+</table>
+<div class="box info">
+  <span class="t">Lectura de la tabla</span>
+  No existe una plataforma «mejor» en abstracto: GitLab maximiza <strong>capacidad y control</strong> a cambio de
+  coste y complejidad, mientras que Bitbucket maximiza <strong>simplicidad y economía</strong> a cambio de depender
+  del ecosistema Atlassian y de complementar su CI/CD con herramientas externas.
+</div>
+
+<!-- ============================== 6 ============================== -->
+<h1 class="section"><span class="num">6.</span> Ejemplo 1 — Demostración con GitLab</h1>
+
+<h2>6.1 Descripción del ejemplo</h2>
+<p>
+Se construyó el proyecto <strong>NotasApp</strong>: un módulo Python para el cálculo de notas académicas con
+validación de rangos, promedio aritmético, promedio ponderado y decisión de aprobación. El proyecto no requiere
+dependencias externas (solo la biblioteca estándar), de modo que puede ejecutarse en cualquier equipo o contenedor,
+y cuenta con <strong>16 pruebas unitarias</strong>.
+</p>
+<p>
+Sobre ese proyecto se aplicó el flujo de trabajo de <strong>GitLab Flow con ramas cortas por funcionalidad y Merge
+Requests</strong>, junto con un pipeline declarado en <code>.gitlab-ci.yml</code> con tres etapas:
+<code>build</code> → <code>test</code> → <code>deploy</code>.
+</p>
+<div class="box info">
+  <span class="t">Objetivo del ejemplo</span>
+  Demostrar, con evidencia real, (a) que el pipeline detecta automáticamente un error antes de integrar el cambio,
+  (b) que el despliegue queda restringido a la rama principal y a una aprobación manual, y (c) qué nivel de
+  complejidad exige la configuración de GitLab para lograr ese control.
+</div>
+
+<h2>6.2 Estructura del proyecto</h2>
+<pre class="code gl">demos/gitlab/
+├── .gitignore                 # exclusión de artefactos de Python
+├── .gitlab-ci.yml             # pipeline CI/CD de GitLab (76 líneas)
+├── README.md                  # descripción y flujo de trabajo
+├── requirements.txt           # sin dependencias externas
+├── scripts/
+│   └── deploy.py              # despliegue simulado invocado por el pipeline
+├── src/
+│   └── notas.py               # lógica de negocio (validación, promedio, ponderado)
+└── tests/
+    └── test_notas.py          # 16 pruebas unitarias con unittest</pre>
+
+<h3>El módulo principal</h3>
+<pre class="code gl">def promedio_ponderado(notas, pesos):
+    """Calcula el promedio ponderado de las notas según sus pesos."""
+    if len(notas) != len(pesos):
+        raise NotaInvalidaError("La cantidad de notas y de pesos debe coincidir")
+    if sum(pesos) &lt;= 0:
+        raise NotaInvalidaError("La suma de los pesos debe ser mayor que cero")
+    total = sum(validar_nota(n) * p for n, p in zip(notas, pesos))
+    return round(total / sum(pesos), 2)</pre>
+<p class="cap">Fragmento final de <code>src/notas.py</code>. Las dos validaciones y el redondeo fueron añadidos
+durante la demostración a raíz de un fallo detectado por las pruebas.</p>
+
+<h2>6.3 El pipeline de GitLab</h2>
+<pre class="code gl"># .gitlab-ci.yml - Pipeline CI/CD de GitLab para NotasApp (demostración)
+
+stages:
+  - build
+  - test
+  - deploy
+
+default:
+  image: python:3.12-slim
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
+
+# Caché compartida entre jobs, invalidada cuando cambia requirements.txt
+cache:
+  key:
+    files:
+      - requirements.txt
+  paths:
+    - .pip-cache/
+
+# ------------------------------- BUILD -------------------------------
+build:
+  stage: build
+  script:
+    - python -m pip install --cache-dir .pip-cache -r requirements.txt
+    - python -m compileall -q src/
+  artifacts:
+    name: "build-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - src/
+    expire_in: 1 week
+
+# -------------------------------- TEST -------------------------------
+test:unitarias:
+  stage: test
+  needs: ["build"]              # DAG: arranca sin esperar otros jobs de 'test'
+  script:
+    - python -m unittest discover -s tests -v
+  artifacts:
+    when: always
+    paths:
+      - tests/
+    expire_in: 3 days
+
+test:estilo:
+  stage: test
+  script:
+    - python -m pip install ruff
+    - ruff check src/
+
+# ------------------------------- DEPLOY ------------------------------
+deploy:staging:
+  stage: deploy
+  needs: ["test:unitarias", "test:estilo"]
+  environment:
+    name: staging
+    url: https://staging.notasapp.example.com
+  script:
+    - python scripts/deploy.py staging
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+deploy:produccion:
+  stage: deploy
+  needs: ["test:unitarias"]
+  environment:
+    name: produccion
+    url: https://notasapp.example.com
+  script:
+    - python scripts/deploy.py produccion
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: manual              # requiere aprobación manual en la interfaz
+    - when: never</pre>
+
+<h3>Verificación de la sintaxis</h3>
+<p>El archivo fue analizado con un intérprete YAML para comprobar su validez antes de la entrega:</p>
+<pre class="term">ARCHIVO YAML VALIDO: demos/gitlab/.gitlab-ci.yml
+  claves de nivel superior: ['stages', 'default', 'variables', 'cache',
+                             'build', 'test:unitarias', 'test:estilo',
+                             'deploy:staging', 'deploy:produccion']
+  etapas: ['build', 'test', 'deploy']
+  jobs definidos: ['build', 'test:unitarias', 'test:estilo',
+                   'deploy:staging', 'deploy:produccion'] | total: 5</pre>
+
+<h2>6.4 Flujo de trabajo ejecutado</h2>
+<p>Estos son los comandos que se ejecutaron realmente sobre el repositorio de demostración:</p>
+<pre class="code gl"># 1) Inicialización del repositorio y versión base de NotasApp
+git init -b main
+git add -A
+git commit -m "feat: version inicial de NotasApp con validacion, promedio y aprobacion"
+
+# 2) Rama corta de funcionalidad (equivale a lo que un Merge Request integrará)
+git switch -c feature/promedio-ponderado
+#   ... se implementa promedio_ponderado y sus 4 pruebas ...
+
+# 3) Confirmación del cambio
+git commit -m "feat: agrega el calculo de promedio ponderado"
+
+# 4) Ejecución de las pruebas (lo que haría el job test:unitarias)
+python -m unittest discover -s tests        # -> FALLA (1 fallo y 1 error)
+
+# 5) Corrección del código
+git commit -m "fix: valida la suma de pesos y redondea el promedio ponderado"
+python -m unittest discover -s tests        # -> 16 pruebas OK
+
+# 6) Higiene del repositorio: se dejan de versionar los artefactos generados
+git rm -r --cached src/__pycache__ tests/__pycache__
+git commit -m "chore: excluye los artefactos de Python del control de versiones"
+
+# 7) Fusión controlada: equivale al botón "Merge" del Merge Request !1
+git switch main
+git merge --no-ff feature/promedio-ponderado \
+    -m "Merge branch 'feature/promedio-ponderado' into 'main'"
+
+# 8) Etiqueta de versión
+git tag -a v1.0.0 -m "Release 1.0.0"
+
+# 9) Segunda iteración: rama de corrección (equivalente al Merge Request !2)
+git switch -c fix/script-despliegue-portable
+git commit -m "fix(ci): migra el despliegue a un script portable en Python"
+git switch main
+git merge --no-ff fix/script-despliegue-portable \
+    -m "Merge branch 'fix/script-despliegue-portable' into 'main'"
+
+# 10) Publicación en el servidor remoto (GitLab.com en un caso real)
+git push -u origin --all
+git push origin --tags</pre>
+<p class="small">
+En la plataforma real, el paso 7 se realiza con el botón <em>Merge</em> del Merge Request, después de que el
+pipeline esté en verde y de cumplirse las aprobaciones exigidas. GitLab permite además crear el MR desde la propia
+consola con <code>git push -o merge_request.create -o merge_request.target=main origin feature/promedio-ponderado</code>.
+</p>
+
+<h2>6.5 Evidencias de ejecución</h2>
+
+<h3>Evidencia 1 — El pipeline detecta el error</h3>
+<p>Tras confirmar la nueva funcionalidad se ejecutaron las pruebas, obteniéndose un fallo y un error. Este es el
+comportamiento que en la plataforma bloquearía el Merge Request:</p>
+<pre class="term fail">=== GITLAB :: job test:unitarias (commit con error) ===
+........F.E.....
+======================================================================
+ERROR: test_rechaza_suma_de_pesos_en_cero
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File ".../demos/gitlab/tests/test_notas.py", line 79, in test_rechaza_suma_de_pesos_en_cero
+    promedio_ponderado([3.0], [0])
+  File ".../demos/gitlab/src/notas.py", line 70, in promedio_ponderado
+    return total / sum(pesos)
+ZeroDivisionError: float division by zero
+
+======================================================================
+FAIL: test_promedio_ponderado_redondea_a_dos_decimales
+----------------------------------------------------------------------
+AssertionError: 3.466666666666667 != 3.47
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.008s
+
+FAILED (failures=1, errors=1)</pre>
+<p class="cap">Salida real de la ejecución de las pruebas sobre el código con el defecto.</p>
+
+<div class="box ok">
+  <span class="t">Qué demuestra esta evidencia</span>
+  El código llegó a tener dos defectos reales: una división por cero cuando la suma de pesos es nula y la ausencia
+  del redondeo prometido en la documentación. Las pruebas automatizadas los detectaron <strong>antes</strong> de
+  integrar el cambio a la rama principal. En GitLab, ese mismo resultado aparecería como pipeline fallido dentro del
+  Merge Request, con el informe de pruebas adjunto, y con las reglas de aprobación activas el botón de fusión
+  quedaría deshabilitado.
+</div>
+
+<h3>Evidencia 2 — Corrección y pipeline en verde</h3>
+<pre class="term">=== GITLAB :: job test:unitarias (tras la correccion) ===
+................
+----------------------------------------------------------------------
+Ran 16 tests in 0.001s
+
+OK</pre>
+<p class="cap">Las 16 pruebas pasan después de añadir las validaciones y el redondeo.</p>
+
+<h3>Evidencia 3 — Restricción del despliegue</h3>
+<p>El job de despliegue solo se ejecuta sobre la rama principal y, en producción, exige aprobación manual
+(<code>when: manual</code>). Así se comportó el paso de despliegue al ejecutarse sobre <code>main</code>:</p>
+<pre class="term">=== GITLAB :: job deploy:produccion ===
+== Despliegue de NotasApp ==
+Entorno .....: produccion
+Commit ......: 07a74e1b
+Rama ........: main
+Fecha .......: 2026-10-24 10:12:27
+Resultado ...: despliegue en produccion completado.</pre>
+<p class="cap">El job <code>deploy:produccion</code> se activa únicamente sobre la rama por defecto, gracias a la regla
+<code>$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH</code>, y requiere una acción manual adicional.</p>
+
+<h3>Evidencia 4 — Historial resultante y etiqueta de versión</h3>
+<pre class="term">=== GITLAB :: historial final ===
+*   07a74e1 (HEAD -&gt; main) Merge branch 'fix/script-despliegue-portable' into 'main'
+|\
+| * 90f8e46 (fix/script-despliegue-portable) fix(ci): migra el despliegue a un script portable en Python
+|/
+*   a89cf2a (tag: v1.0.0) Merge branch 'feature/promedio-ponderado' into 'main'
+|\
+| * 3248d35 (feature/promedio-ponderado) chore: excluye los artefactos de Python del control de versiones
+| * 7a30b05 fix: valida la suma de pesos y redondea el promedio ponderado
+| * 6e6fd95 feat: agrega el calculo de promedio ponderado
+|/
+* 8d1ff8a feat: version inicial de NotasApp con validacion, promedio y aprobacion
+
+=== GITLAB :: estado del repositorio ===
+## main
+=== GITLAB :: pruebas sobre main ===
+Ran 16 tests in 0.001s
+
+OK
+
+=== GITLAB :: etiquetas ===
+v1.0.0 -&gt; Release 1.0.0</pre>
+<p class="cap">Cada fusión conserva su <em>commit</em> de integración (<code>--no-ff</code>), lo que hace trazable qué
+cambio entró, cuándo y desde qué rama; el árbol queda limpio y etiquetado.</p>
+
+<h3>Evidencia 5 — Publicación en el remoto</h3>
+<pre class="term">=== GITLAB :: git push -u origin --all ===
+branch 'feature/promedio-ponderado' set up to track 'origin/feature/promedio-ponderado'.
+branch 'fix/script-despliegue-portable' set up to track 'origin/fix/script-despliegue-portable'.
+branch 'main' set up to track 'origin/main'.
+To .../gitlab-notasapp.git
+ * [new branch]      feature/promedio-ponderado -&gt; feature/promedio-ponderado
+ * [new branch]      fix/script-despliegue-portable -&gt; fix/script-despliegue-portable
+ * [new branch]      main -&gt; main
+=== GITLAB :: git push origin --tags ===
+ * [new tag]         v1.0.0 -&gt; v1.0.0</pre>
+<p class="cap">Se publicaron las tres ramas y la etiqueta. Sobre un servidor GitLab real, el primer
+<em>push</em> de una rama nueva habilita el enlace para crear el Merge Request.</p>
+
+<h2>6.6 Análisis del ejemplo de GitLab</h2>
+<div class="cols">
+  <div>
+    <div class="box ok">
+      <span class="t">Lo que el ejemplo demuestra a favor</span>
+      <ul>
+        <li><strong>Control fino del flujo:</strong> la palabra clave <code>needs</code> permite que <code>test:unitarias</code> arranque sin esperar a <code>test:estilo</code>, algo imposible en la lista secuencial de Bitbucket.</li>
+        <li><strong>Reglas expresivas:</strong> <code>rules</code> con comparación de variables evita desplegar desde una rama de trabajo.</li>
+        <li><strong>Entornos con identidad:</strong> <code>environment</code> define nombre y URL, y la plataforma conserva el historial de despliegues y permite revertir.</li>
+        <li><strong>Artefactos y caducidad:</strong> <code>artifacts</code> con <code>expire_in</code> y <code>when: always</code> garantiza que los resultados se conserven incluso cuando el <em>job</em> falla, justo lo necesario para diagnosticar el error del ejemplo.</li>
+        <li><strong>Caché inteligente:</strong> la clave derivada de <code>requirements.txt</code> invalida la caché solo cuando cambian las dependencias.</li>
+        <li><strong>Creación del MR desde la consola:</strong> reduce pasos manuales en el flujo diario.</li>
+      </ul>
+    </div>
+  </div>
+  <div>
+    <div class="box bad">
+      <span class="t">Lo que el ejemplo evidencia en contra</span>
+      <ul>
+        <li><strong>Densidad de configuración:</strong> 76 líneas y nueve claves de nivel superior para un proyecto mínimo. Esa potencia se paga en tiempo de aprendizaje.</li>
+        <li><strong>Dependencia de la interfaz para cerrar el ciclo:</strong> la aprobación manual y las reglas de aprobación se gestionan en la web, lo que añade un paso humano.</li>
+        <li><strong>Mayor consumo de recursos:</strong> el <em>job</em> de estilo descarga herramientas en cada ejecución si no se cachean; optimizar el pipeline exige conocimiento adicional.</li>
+        <li><strong>Coste:</strong> en la nube, cada minuto consumido cuenta sobre los 400 del plan gratuito, salvo que se usen <em>runners</em> propios.</li>
+        <li><strong>Ruido por artefactos:</strong> el propio ejemplo mostró que sin un <code>.gitignore</code> cuidado se pueden versionar archivos generados como <code>__pycache__</code>.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== 7 ============================== -->
+<h1 class="section"><span class="num">7.</span> Ejemplo 2 — Demostración con Bitbucket</h1>
+
+<h2>7.1 Descripción del ejemplo</h2>
+<p>
+Se utilizó <strong>exactamente el mismo código</strong> de NotasApp (mismas 16 pruebas, misma lógica) en un segundo
+repositorio, ahora con el flujo de <strong>ramas cortas y Pull Request</strong> propio de Bitbucket y con los
+pipelines declarados en <code>bitbucket-pipelines.yml</code>. El objetivo es que la comparación sea justa: lo único
+que cambia es la plataforma.
+</p>
+
+<h2>7.2 Estructura del proyecto</h2>
+<pre class="code bb">demos/bitbucket/
+├── .gitignore
+├── bitbucket-pipelines.yml    # CI/CD de Bitbucket (67 líneas)
+├── README.md
+├── requirements.txt
+├── scripts/
+│   └── deploy.py
+├── src/
+│   └── notas.py               # idéntico al del ejemplo de GitLab
+└── tests/
+    └── test_notas.py          # las mismas 16 pruebas</pre>
+
+<h2>7.3 Los pipelines de Bitbucket</h2>
+<pre class="code bb"># bitbucket-pipelines.yml - Pipeline CI/CD de Bitbucket para NotasApp
+
+image: python:3.12-slim
+
+definitions:
+  caches:
+    pip-cache: /root/.cache/pip        # caché de dependencias reutilizable
+
+  steps:                               # steps reutilizables mediante anclas YAML (&amp; / *)
+    - step: &amp;build
+        name: Compilar
+        caches:
+          - pip-cache
+        script:
+          - python -m pip install --cache-dir /root/.cache/pip -r requirements.txt
+          - python -m compileall -q src/
+        artifacts:
+          - src/**
+
+    - step: &amp;test
+        name: Pruebas unitarias
+        caches:
+          - pip-cache
+        script:
+          - python -m unittest discover -s tests -v
+        artifacts:
+          - tests/**
+
+    - step: &amp;estilo
+        name: Revisión de estilo
+        caches:
+          - pip-cache
+        script:
+          - python -m pip install ruff
+          - ruff check src/
+
+pipelines:
+  # Se ejecuta en cualquier push que no coincida con una regla más específica
+  default:
+    - step: *build
+    - step: *test
+
+  # Pull Requests: además del build y las pruebas, exige revisión de estilo
+  pull-requests:
+    '**':
+      - step: *build
+      - step: *test
+      - step: *estilo
+
+  # Rama principal: incluye despliegues a los entornos
+  branches:
+    main:
+      - step: *build
+      - step: *test
+      - step: *estilo
+      - step:
+          name: Desplegar en Staging
+          deployment: staging
+          script:
+            - python scripts/deploy.py staging
+      - step:
+          name: Desplegar en Producción
+          deployment: production
+          trigger: manual            # requiere aprobación manual en la interfaz
+          script:
+            - python scripts/deploy.py production</pre>
+
+<h3>Verificación de la sintaxis</h3>
+<pre class="term">ARCHIVO YAML VALIDO: demos/bitbucket/bitbucket-pipelines.yml
+  claves de nivel superior: ['image', 'definitions', 'pipelines']
+  claves de pipelines: ['default', 'pull-requests', 'branches']
+  steps reutilizables: ['Compilar', 'Pruebas unitarias', 'Revisión de estilo']</pre>
+
+<h2>7.4 Flujo de trabajo ejecutado</h2>
+<pre class="code bb"># 1) Versión base
+git init -b main
+git add -A
+git commit -m "feat: version inicial de NotasApp con validacion, promedio y aprobacion"
+
+# 2) Rama de funcionalidad (será el origen del Pull Request #1)
+git switch -c feature/promedio-ponderado
+git commit -m "feat: agrega el calculo de promedio ponderado"
+python -m unittest discover -s tests        # -> FALLA (1 fallo y 1 error)
+git commit -m "fix: valida la suma de pesos y redondea el promedio ponderado"
+python -m unittest discover -s tests        # -> 16 pruebas OK
+git rm -r --cached src/__pycache__ tests/__pycache__
+git commit -m "chore: excluye los artefactos de Python del control de versiones"
+
+# 3) Fusión: en Bitbucket el PR se aprueba en la interfaz web y deja este mensaje
+git switch main
+git merge --no-ff feature/promedio-ponderado \
+    -m "Merged in feature/promedio-ponderado (pull request #1)"
+git tag -a v1.0.0 -m "Release 1.0.0"
+
+# 4) Pull Request #2
+git switch -c fix/script-despliegue-portable
+git commit -m "fix(ci): migra el despliegue a un script portable en Python"
+git switch main
+git merge --no-ff fix/script-despliegue-portable \
+    -m "Merged in fix/script-despliegue-portable (pull request #2)"
+
+# 5) Publicación
+git push -u origin --all
+git push origin --tags</pre>
+<p class="small">
+Diferencia operativa importante: en Bitbucket <strong>no existe una opción de <em>push</em> que cree el Pull
+Request</strong>; la propuesta se abre desde la interfaz web o mediante la API REST. Además, el flujo real se
+completó con las comprobaciones de fusión (<em>merge checks</em>) configuradas para exigir pipeline correcto y un
+número mínimo de revisores; en los planes Free y Standard estas comprobaciones se muestran como recomendaciones y
+solo en Premium pueden hacerse obligatorias.
+</p>
+
+<h2>7.5 Evidencias de ejecución</h2>
+
+<h3>Evidencia 1 — El mismo defecto, detectado por las pruebas</h3>
+<pre class="term fail">=== BITBUCKET :: step Pruebas unitarias (commit con error) ===
+........F.E.....
+======================================================================
+ERROR: test_rechaza_suma_de_pesos_en_cero
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File ".../demos/bitbucket/tests/test_notas.py", line 79, in test_rechaza_suma_de_pesos_en_cero
+    promedio_ponderado([3.0], [0])
+  File ".../demos/bitbucket/src/notas.py", line 70, in promedio_ponderado
+    return total / sum(pesos)
+ZeroDivisionError: float division by zero
+
+======================================================================
+FAIL: test_promedio_ponderado_redondea_a_dos_decimales
+----------------------------------------------------------------------
+AssertionError: 3.466666666666667 != 3.47
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.008s
+
+FAILED (failures=1, errors=1)</pre>
+<p class="cap">En Bitbucket este resultado haría fallar el <em>step</em> «Pruebas unitarias» y el Pull Request
+mostraría la comprobación en rojo. A diferencia de GitLab, el detalle de las pruebas no se publica de forma nativa
+en el PR: habría que consultar el registro del <em>step</em> o enviar los resultados mediante Code Insights.</p>
+
+<h3>Evidencia 2 — Corrección y pruebas en verde</h3>
+<pre class="term">=== BITBUCKET :: step Pruebas unitarias (tras la correccion) ===
+................
+----------------------------------------------------------------------
+Ran 16 tests in 0.001s
+
+OK</pre>
+
+<h3>Evidencia 3 — Despliegue</h3>
+<pre class="term">=== BITBUCKET :: step Desplegar en Produccion ===
+== Despliegue de NotasApp ==
+Entorno .....: production
+Commit ......: efc1b9d2
+Rama ........: main
+Fecha .......: 2026-10-24 10:12:54
+Resultado ...: despliegue en production completado.</pre>
+<p class="cap">El <em>step</em> se declara dentro de <code>pipelines.branches.main</code> y usa <code>trigger: manual</code>.
+Bitbucket registra el despliegue en el entorno, pero no define una URL ni conserva el historial de reversión que
+GitLab asocia al entorno.</p>
+
+<h3>Evidencia 4 — Historial y etiqueta</h3>
+<pre class="term">=== BITBUCKET :: historial final ===
+*   efc1b9d (HEAD -&gt; main) Merged in fix/script-despliegue-portable (pull request #2)
+|\
+| * c7dd0fc (fix/script-despliegue-portable) fix(ci): migra el despliegue a un script portable en Python
+|/
+*   b623000 (tag: v1.0.0) Merged in feature/promedio-ponderado (pull request #1)
+|\
+| * 4837826 (feature/promedio-ponderado) chore: excluye los artefactos de Python del control de versiones
+| * d146a69 fix: valida la suma de pesos y redondea el promedio ponderado
+| * bbe9c6f feat: agrega el calculo de promedio ponderado
+|/
+* 648f174 feat: version inicial de NotasApp con validacion, promedio y aprobacion
+
+=== BITBUCKET :: estado del repositorio ===
+## main
+=== BITBUCKET :: pruebas sobre main ===
+Ran 16 tests in 0.001s
+
+OK
+
+=== BITBUCKET :: etiquetas ===
+v1.0.0 -&gt; Release 1.0.0</pre>
+<p class="cap">La convención de mensajes de Bitbucket («Merged in … (pull request #n)») identifica claramente cada
+integración, igual que en GitLab lo hace «Merge branch … into 'main'».</p>
+
+<h3>Evidencia 5 — Publicación</h3>
+<pre class="term">=== BITBUCKET :: git push -u origin --all ===
+branch 'feature/promedio-ponderado' set up to track 'origin/feature/promedio-ponderado'.
+branch 'fix/script-despliegue-portable' set up to track 'origin/fix/script-despliegue-portable'.
+branch 'main' set up to track 'origin/main'.
+ * [new branch]      feature/promedio-ponderado -&gt; feature/promedio-ponderado
+ * [new branch]      fix/script-despliegue-portable -&gt; fix/script-despliegue-portable
+ * [new branch]      main -&gt; main
+=== BITBUCKET :: git push origin --tags ===
+ * [new tag]         v1.0.0 -&gt; v1.0.0</pre>
+<p class="cap">Sobre un servidor Bitbucket real, este <em>push</em> funcionaría con clave SSH o con un API token
+(las contraseñas de aplicación ya no se admiten desde julio de 2026).</p>
+
+<h2>7.6 Análisis del ejemplo de Bitbucket</h2>
+<div class="cols">
+  <div>
+    <div class="box ok">
+      <span class="t">Lo que el ejemplo demuestra a favor</span>
+      <ul>
+        <li><strong>Simplicidad:</strong> tres claves de nivel superior (<code>image</code>, <code>definitions</code>, <code>pipelines</code>) frente a las nueve de GitLab.</li>
+        <li><strong>Organización declarativa por evento:</strong> <code>default</code>, <code>pull-requests</code> y <code>branches</code> expresan la política sin condicionales.</li>
+        <li><strong>Reutilización con anclas YAML:</strong> los tres <em>steps</em> se definen una vez y se referencian con <code>*build</code>, <code>*test</code>, <code>*estilo</code>, evitando duplicación.</li>
+        <li><strong>Menos configuración para el mismo resultado:</strong> 67 líneas frente a 76 con funcionalidad equivalente.</li>
+        <li><strong>Despliegue por entorno sencillo:</strong> la clave <code>deployment</code> y <code>trigger: manual</code> se leen sin conocer reglas de expresión.</li>
+      </ul>
+    </div>
+  </div>
+  <div>
+    <div class="box bad">
+      <span class="t">Lo que el ejemplo evidencia en contra</span>
+      <ul>
+        <li><strong>Ejecución secuencial obligatoria:</strong> no existe <code>needs</code>, por lo que el estilo esperaría aunque las pruebas pudieran correr antes; el pipeline completo tarda más.</li>
+        <li><strong>Sin plantillas compartidas:</strong> las anclas YAML solo funcionan dentro del mismo archivo; reutilizar configuración entre repositorios depende de Pipes o de copiar el archivo.</li>
+        <li><strong>Menos control sobre el almacenamiento de resultados:</strong> los <em>artefactos</em> no admiten reglas de conservación ni informes de prueba nativos.</li>
+        <li><strong>Sin URL de entorno ni reversión nativa</strong> asociada al despliegue.</li>
+        <li><strong>Dependencia de la interfaz</strong> para abrir el PR y, en planes inferiores, para que las comprobaciones de fusión sean efectivas.</li>
+        <li><strong>50 minutos gratuitos al mes:</strong> con este proyecto consumiría ~2 minutos por <em>push</em>, es decir, unos 25 <em>pushes</em> antes de tener que pagar.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== 8 ============================== -->
+<h1 class="section"><span class="num">8.</span> Análisis comparativo de las dos demostraciones</h1>
+<p>
+Ambos proyectos partieron del mismo código y de las mismas pruebas. Todas las diferencias observadas provienen, por
+tanto, de la plataforma.
+</p>
+
+<h2>8.1 Resultados medidos</h2>
+<table>
+  <thead><tr><th style="width:34%">Métrica</th><th style="width:33%">GitLab</th><th>Bitbucket</th></tr></thead>
+  <tbody>
+    <tr><td class="crit">Líneas del archivo de CI/CD</td><td>76</td><td>67</td></tr>
+    <tr><td class="crit">Claves de nivel superior</td><td>9</td><td>3</td></tr>
+    <tr><td class="crit">Unidades de ejecución</td><td>5 <em>jobs</em> en 3 etapas</td><td>3 <em>steps</em> reutilizables en 3 secciones</td></tr>
+    <tr><td class="crit">Paralelismo entre tareas de prueba</td><td>Sí (<code>needs</code> forma un grafo)</td><td>No (orden estrictamente secuencial)</td></tr>
+    <tr><td class="crit">Reutilización fuera del archivo</td><td>Sí (<code>include</code>, <code>extends</code>)</td><td>No (solo anclas dentro del archivo)</td></tr>
+    <tr><td class="crit">Condiciones de ejecución</td><td>Expresiones con <code>rules</code> y variables</td><td>Secciones por tipo de evento y rama</td></tr>
+    <tr><td class="crit">Entornos de despliegue</td><td>Nombre + URL + historial y reversión</td><td>Nombre del entorno, sin URL ni reversión</td></tr>
+    <tr><td class="crit">Informes de prueba en la revisión</td><td>Nativos (informes adjuntos al MR)</td><td>No nativos (Code Insights o revisar el registro)</td></tr>
+    <tr><td class="crit">Creación de la propuesta desde la consola</td><td>Sí (<code>git push -o merge_request.create</code>)</td><td>No</td></tr>
+    <tr><td class="crit">Resultado de la ejecución local</td><td>16 pruebas correctas, despliegue y etiqueta v1.0.0</td><td>16 pruebas correctas, despliegue y etiqueta v1.0.0</td></tr>
+  </tbody>
+</table>
+<p class="small">
+Interpretación: para un proyecto pequeño ambos son suficientes y el resultado funcional es idéntico. La diferencia
+se manifiesta al <strong>crecer</strong>: cuantos más módulos, entornos y equipos, más pesa la falta de paralelismo,
+de plantillas compartidas y de informes nativos en Bitbucket; y cuanto más pequeño y presupuestado sea el equipo,
+más pesa el coste y la complejidad de GitLab.
+</p>
+
+<h2>8.2 Traducción de conceptos entre las dos plataformas</h2>
+<table>
+  <thead><tr><th style="width:26%">Concepto</th><th style="width:37%">GitLab</th><th>Bitbucket</th></tr></thead>
+  <tbody>
+    <tr><td class="crit">Propuesta de cambio</td><td>Merge Request</td><td>Pull Request</td></tr>
+    <tr><td class="crit">Unidad de trabajo del pipeline</td><td><em>job</em> con <code>stage</code></td><td><em>step</em> dentro de una lista</td></tr>
+    <tr><td class="crit">Orden de fases</td><td><code>stages</code> (lista ordenada)</td><td>Orden de aparición en la lista de <em>steps</em></td></tr>
+    <tr><td class="crit">Imagen de ejecución</td><td><code>image</code> global o por <em>job</em></td><td><code>image</code> global o por <em>step</em></td></tr>
+    <tr><td class="crit">Caché</td><td><code>cache</code> con clave derivada de archivos</td><td><code>caches</code> con rutas declaradas</td></tr>
+    <tr><td class="crit">Artefactos</td><td><code>artifacts</code> con rutas, informes y caducidad</td><td><code>artifacts</code> como lista de rutas o comodines</td></tr>
+    <tr><td class="crit">Condicionales</td><td><code>rules</code> con expresiones</td><td>Secciones <code>branches</code>, <code>pull-requests</code>, <code>tags</code></td></tr>
+    <tr><td class="crit">Dependencias entre tareas</td><td><code>needs</code> (grafo)</td><td>No existe; se hereda el orden</td></tr>
+    <tr><td class="crit">Reutilización</td><td><code>include</code>, <code>extends</code>, plantillas</td><td>Anclas YAML y Pipes del mercado</td></tr>
+    <tr><td class="crit">Entorno</td><td><code>environment</code> (nombre y URL)</td><td><code>deployment</code> (nombre)</td></tr>
+    <tr><td class="crit">Ejecución manual</td><td><code>when: manual</code></td><td><code>trigger: manual</code></td></tr>
+    <tr><td class="crit">Autenticación por HTTPS</td><td>Personal Access Token</td><td>API token con permisos</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================== 9 ============================== -->
+<h1 class="section"><span class="num">9.</span> Ventajas y desventajas de una plataforma sobre la otra</h1>
+
+<h2>9.1 Dónde GitLab es claramente superior</h2>
+<table class="gl">
+  <thead><tr><th style="width:30%">Ventaja de GitLab</th><th>Por qué es relevante</th></tr></thead>
+  <tbody>
+    <tr><td class="crit">CI/CD más potente</td><td>Grafo de dependencias, plantillas compartidas, <em>merge trains</em> y <em>pipelines</em> multicitados permiten pipelines completos en monorepos y microservicios, con mayor velocidad y menos duplicación.</td></tr>
+    <tr><td class="crit">Una sola plataforma</td><td>Evita integrar y pagar herramientas separadas de registro de imágenes, análisis de seguridad y planificación.</td></tr>
+    <tr><td class="crit">Seguridad integrada</td><td>El análisis estático, de dependencias, contenedores y secretos se ejecuta sin licencias de terceros (suite completa en Ultimate).</td></tr>
+    <tr><td class="crit">Autoalojamiento con paridad</td><td>Permite cumplir requisitos de soberanía de datos y trabajar en redes aisladas manteniendo las mismas funciones; solo la edición Community ya es gratuita y auditable.</td></tr>
+    <tr><td class="crit">Trazabilidad de despliegues</td><td>Entornos con URL, historial y reversión: facilita la operación y la auditoría de qué versión está publicada.</td></tr>
+    <tr><td class="crit">Informes nativos en la revisión</td><td>El resultado de las pruebas y de la cobertura aparece dentro del Merge Request, acortando el tiempo de diagnóstico.</td></tr>
+  </tbody>
+</table>
+
+<h2>9.2 Dónde Bitbucket es claramente superior</h2>
+<table class="bb">
+  <thead><tr><th style="width:30%">Ventaja de Bitbucket</th><th>Por qué es relevante</th></tr></thead>
+  <tbody>
+    <tr><td class="crit">Coste</td><td>3,65 USD por usuario en Standard frente a 29 USD del Premium de GitLab: para 20 desarrolladores la diferencia supera los 6 000 USD al año.</td></tr>
+    <tr><td class="crit">Integración con Jira y Confluence</td><td>Enlaza confirmaciones, ramas, despliegues y tareas sin configuración adicional, lo que resulta decisivo en organizaciones ya asentadas en Atlassian.</td></tr>
+    <tr><td class="crit">Simplicidad</td><td>Menos conceptos, archivo de configuración más corto y curva de aprendizaje baja: un equipo nuevo produce pipelines útiles el primer día.</td></tr>
+    <tr><td class="crit">Nivel gratuito para equipos pequeños</td><td>Cinco usuarios con repositorios privados ilimitados, suficiente para proyectos académicos o de arranque.</td></tr>
+    <tr><td class="crit">Data Center con clúster activo‑activo</td><td>Alta disponibilidad autoalojada consolidada, con soporte empresarial de Atlassian.</td></tr>
+    <tr><td class="crit">Seguridad de red asequible</td><td>Listas de IP permitidas y doble factor obligatorio en el plan Premium, cuyo precio sigue siendo inferior al de entrada de GitLab.</td></tr>
+  </tbody>
+</table>
+
+<h2>9.3 Resumen ejecutivo de la comparación</h2>
+<div class="box info">
+  <span class="t">En una frase por plataforma</span>
+  <strong>GitLab:</strong> máxima capacidad, control y autonomía (incluido el autoalojamiento), al precio de mayor
+  complejidad y mayor coste por usuario.<br>
+  <strong>Bitbucket:</strong> mínima fricción y menor coste, integrado de forma insuperable con Jira, a cambio de un
+  CI/CD más limitado, ausencia de seguridad y registros nativos y dependencia del ecosistema Atlassian, que en 2026
+  se redujo aún más con el retiro de las incidencias y las <em>wikis</em> propias.
+</div>
+
+<!-- ============================== 10 ============================== -->
+<h1 class="section"><span class="num">10.</span> Conclusiones y recomendaciones</h1>
+
+<h2>10.1 Conclusiones</h2>
+<ol>
+  <li><strong>Las dos plataformas resuelven el problema central</strong> del versionamiento en la nube: alojan
+      repositorios Git, gestionan permisos, permiten revisar código y automatizan pruebas y despliegues. Con el mismo
+      proyecto se obtuvo el mismo resultado funcional: 16 pruebas correctas, versión etiquetada y despliegue
+      controlado.</li>
+  <li><strong>Las diferencias aparecen en el gobierno del proceso, no en el resultado.</strong> GitLab ofreció
+      paralelismo entre tareas, condiciones expresivas, entornos con reversión e informes nativos; Bitbucket resolvió
+      lo mismo con menos líneas y menos conceptos, pero de forma secuencial y con menos control.</li>
+  <li><strong>El CI/CD de GitLab es más potente y el de Bitbucket más sencillo.</strong> La evidencia es medible:
+      5 <em>jobs</em> con grafo de dependencias frente a 3 <em>steps</em> secuenciales, y 9 claves de configuración
+      frente a 3.</li>
+  <li><strong>El coste es la diferencia más contundente.</strong> El plan de entrada de pago de GitLab cuesta unas
+      ocho veces más por usuario que el de Bitbucket, aunque incluye registro de contenedores, seguridad y
+      planificación que en Bitbucket habría que contratar aparte.</li>
+  <li><strong>La integración con Jira es el argumento decisivo de Bitbucket.</strong> Si la organización ya gestiona
+      su trabajo en Jira y su documentación en Confluence, la ventaja de Bitbucket es difícil de igualar; si no, su
+      valor disminuye notablemente, sobre todo tras el retiro de sus incidencias y <em>wikis</em> nativas en 2026.</li>
+  <li><strong>La seguridad y los registros nativos son exclusivos de GitLab</strong> entre las dos opciones
+      analizadas; en Bitbucket se depende de herramientas de terceros, lo que añade coste y complejidad de
+      integración.</li>
+  <li><strong>El autoalojamiento es el terreno donde GitLab no tiene competencia</strong> dentro de esta
+      comparación: la Community Edition, bajo licencia MIT, permite operar una plataforma completa sin coste de
+      licencia, algo imposible con Bitbucket.</li>
+  <li><strong>La autenticación obliga a actualizar automatizaciones.</strong> Con la desaparición de las
+      contraseñas de aplicación de Bitbucket (julio de 2026), cualquier script que usara HTTPS debe migrar a API
+      tokens; en GitLab el uso de Personal Access Tokens o claves SSH ya era la práctica habitual.</li>
+</ol>
+
+<h2>10.2 Recomendaciones</h2>
+<table>
+  <thead><tr><th style="width:30%">Si su situación es…</th><th>Plataforma recomendada y razón</th></tr></thead>
+  <tbody>
+    <tr><td class="crit">Ya usa Jira y Confluence y el presupuesto es limitado</td><td><strong>Bitbucket.</strong> La integración es inmediata y el coste por usuario es el más bajo; complete con Pipes lo que no es nativo.</td></tr>
+    <tr><td class="crit">Equipo pequeño (≤ 5) con proyecto privado sencillo</td><td><strong>Bitbucket Free</strong> si el uso intensivo de CI/CD es esporádico; <strong>GitLab Free</strong> si necesita más minutos de cómputo (400 frente a 50) o publicar sitios estáticos.</td></tr>
+    <tr><td class="crit">Necesita integración y entrega continua avanzadas, varios entornos y equipos numerosos</td><td><strong>GitLab.</strong> El grafo de dependencias, las plantillas compartidas y los entornos con reversión reducen tiempos y errores de publicación.</td></tr>
+    <tr><td class="crit">Debe autoalojar por normativa o soberanía de datos</td><td><strong>GitLab Self‑Managed</strong> (Community Edition gratuita o Enterprise), por su paridad funcional y su capacidad de operar en red aislada.</td></tr>
+    <tr><td class="crit">Requiere análisis de seguridad integrado y cumplimiento</td><td><strong>GitLab</strong> (la suite completa, en Ultimate), para evitar licencias y procesos separados.</td></tr>
+    <tr><td class="crit">Proyecto académico o de aprendizaje con énfasis en CI/CD</td><td><strong>GitLab</strong>, por su nivel gratuito más generoso en minutos de cómputo y por el valor formativo de su pipeline declarativo completo.</td></tr>
+  </tbody>
+</table>
+
+<h2>10.3 Recomendación metodológica final</h2>
+<p>
+Antes de decidir, se recomienda ejecutar una prueba de concepto con el proyecto real durante un ciclo de desarrollo
+completo: medir los minutos de CI/CD consumidos, el número de integraciones necesarias y el coste total para el
+tamaño de equipo definitivo. En esta comparación, la verificación de precios resultó indispensable: durante la
+investigación se encontraron cifras distintas entre las propias páginas de Atlassian, lo que confirma que los
+valores deben confirmarse antes de cualquier decisión presupuestal.
+</p>
+
+<!-- ============================== 11 ============================== -->
+<h1 class="section"><span class="num">11.</span> Referencias y fuentes consultadas</h1>
+<p class="small">
+Consulta realizada el 24 de octubre de 2026. Se priorizaron las fuentes oficiales de cada proveedor; los análisis
+de terceros se emplearon para datos de mercado y comparaciones de precio.
+</p>
+
+<h3>Documentación y páginas oficiales de GitLab</h3>
+<ul class="small">
+  <li>GitLab — Planes y precios: <code>https://about.gitlab.com/pricing/</code></li>
+  <li>GitLab — Arquitectura y componentes: <code>https://docs.gitlab.com/development/architecture/</code></li>
+  <li>GitLab — Gitaly y Gitaly Cluster: <code>https://docs.gitlab.com/administration/gitaly/</code></li>
+  <li>GitLab — GitLab Runner y sus ejecutores: <code>https://docs.gitlab.com/runner/</code> y <code>https://docs.gitlab.com/runner/executors/</code></li>
+  <li>GitLab — Referencia de sintaxis de CI/CD en YAML: <code>https://docs.gitlab.com/ci/yaml/</code></li>
+  <li>GitLab — Ramas protegidas: <code>https://docs.gitlab.com/user/project/repository/branches/protected/</code></li>
+  <li>GitLab — Entornos y despliegues: <code>https://docs.gitlab.com/ci/environments/</code></li>
+  <li>GitLab — Container Registry: <code>https://docs.gitlab.com/user/packages/container_registry/</code></li>
+  <li>GitLab — Tokens de acceso personal: <code>https://docs.gitlab.com/user/profile/personal_access_tokens/</code></li>
+  <li>GitLab Handbook — Historia de la compañía: <code>https://handbook.gitlab.com/handbook/company/history/</code></li>
+  <li>GitLab — Requisitos de instalación (memoria y hardware): <code>https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/install/requirements.md</code></li>
+</ul>
+
+<h3>Documentación y páginas oficiales de Bitbucket / Atlassian</h3>
+<ul class="small">
+  <li>Bitbucket — Precios: <code>https://bitbucket.org/product/pricing</code></li>
+  <li>Atlassian — Precios de Bitbucket: <code>https://www.atlassian.com/software/bitbucket/pricing</code></li>
+  <li>Bitbucket — Configuración de <code>bitbucket-pipelines.yml</code>: <code>https://support.atlassian.com/bitbucket-cloud/docs/configure-bitbucket-pipelinesyml/</code></li>
+  <li>Bitbucket — Descripción general (Cloud frente a Data Center): <code>https://bitbucket.org/product/guides/getting-started/overview</code></li>
+  <li>Atlassian — Comparación Cloud frente a Data Center: <code>https://www.atlassian.com/migration/assess/compare-cloud-data-center/bitbucket</code></li>
+  <li>Bitbucket — Registro de cambios (retiro de contraseñas de aplicación): <code>https://developer.atlassian.com/cloud/bitbucket/changelog/</code></li>
+  <li>Atlassian — Guía para migrar incidencias de Bitbucket a Jira: <code>https://support.atlassian.com/bitbucket-cloud/kb/guide-to-migrating-issues-from-bitbucket-cloud-to-jira-cloud/</code></li>
+  <li>Atlassian — Hoja de ruta de Data Center: <code>https://www.atlassian.com/roadmap/data-center</code></li>
+</ul>
+
+<h3>Análisis de terceros y datos de mercado (2026)</h3>
+<ul class="small">
+  <li>devops-daily — Comparativa Bitbucket frente a GitLab: <code>https://devops-daily.com/comparisons/bitbucket-vs-gitlab</code></li>
+  <li>SaaSCompared — GitHub, GitLab y Bitbucket en 2026: <code>https://saascompared.com/blog/github-vs-gitlab-vs-bitbucket-2026-refresh</code></li>
+  <li>FOSS Post — Estadísticas de cuota de mercado de Git: <code>https://fosspost.org/git-market-share-statistics/</code></li>
+  <li>JetBrains / AWSQuality — Herramientas de CI/CD más usadas: <code>https://www.awsquality.com/best-ci-cd-tools-what-the-data-actually-shows/</code></li>
+  <li>eesel — Precios de Bitbucket y de GitLab: <code>https://www.eesel.ai/blog/bitbucket-pricing</code> y <code>https://www.eesel.ai/blog/gitlab-pricing</code></li>
+</ul>
+
+<div class="box warn">
+  <span class="t">Advertencia sobre los datos</span>
+  <ul>
+    <li>Los precios varían por región, moneda, impuestos y tamaño de equipo, y cambian con frecuencia. Deben verificarse en la web oficial antes de presupuestar.</li>
+    <li>En GitLab, el plan Ultimate se ofrece con precio personalizado; el nivel gratuito limita a 5 usuarios por grupo de nivel superior en la nube, límite que no aplica en instalaciones autoalojadas.</li>
+    <li>Las cuotas de mercado son estimaciones de analistas y varían según la metodología (repositorios públicos o privados, empresas o desarrolladores).</li>
+  </ul>
+</div>
+
+<!-- ============================== 12 ============================== -->
+<h1 class="section"><span class="num">12.</span> Anexos: archivos entregados y reproducción</h1>
+
+<h2>12.1 Archivos entregados</h2>
+<table>
+  <thead><tr><th style="width:36%">Archivo</th><th>Contenido</th></tr></thead>
+  <tbody>
+    <tr><td class="crit">Informe-GitLab-vs-Bitbucket.pdf</td><td>Este informe (investigación, demostraciones y análisis).</td></tr>
+    <tr><td class="crit">demos/gitlab/</td><td>Repositorio Git del Ejemplo 1: <code>.gitlab-ci.yml</code>, <code>src/notas.py</code>, <code>tests/test_notas.py</code>, <code>scripts/deploy.py</code>, <code>README.md</code>, <code>.gitignore</code> e historial completo con <em>commits</em> y etiqueta <code>v1.0.0</code>.</td></tr>
+    <tr><td class="crit">demos/bitbucket/</td><td>Repositorio Git del Ejemplo 2: <code>bitbucket-pipelines.yml</code> y los mismos archivos de aplicación, con su propio historial y etiqueta <code>v1.0.0</code>.</td></tr>
+  </tbody>
+</table>
+
+<h2>12.2 Cómo reproducir la demostración</h2>
+<pre class="code"># Ejecutar las pruebas unitarias de cualquiera de los dos proyectos
+cd demos/gitlab          # o demos/bitbucket
+python -m unittest discover -s tests -v      # 16 pruebas
+
+# Simular el paso de despliegue de los pipelines
+python scripts/deploy.py produccion
+
+# Consultar el historial y las etiquetas de la demostración
+git log --graph --oneline --decorate --all
+git tag -l
+
+# Validar la sintaxis del archivo de configuración de CI/CD
+python -c "import yaml;print(list(yaml.safe_load(open('.gitlab-ci.yml')).keys()))"
+
+# Publicar en un remoto (en la plataforma real, previa configuración de la URL y las credenciales)
+git remote add origin <URL-del-repositorio>
+git push -u origin --all
+git push origin --tags</pre>
+
+<h2>12.3 Correspondencia entre la demostración y la plataforma real</h2>
+<table>
+  <thead><tr><th style="width:38%">En la demostración</th><th>En GitLab o Bitbucket</th></tr></thead>
+  <tbody>
+    <tr><td class="crit"><code>git merge --no-ff</code> con mensaje de integración</td><td>Botón <em>Merge</em> del Merge Request / Pull Request, tras las aprobaciones y con el pipeline correcto.</td></tr>
+    <tr><td class="crit">Ejecución manual de <code>python -m unittest</code></td><td><em>Job</em> <code>test:unitarias</code> (GitLab) o <em>step</em> «Pruebas unitarias» (Bitbucket) dentro del pipeline.</td></tr>
+    <tr><td class="crit"><code>python scripts/deploy.py produccion</code></td><td><em>Job</em> <code>deploy:produccion</code> con <code>when: manual</code> (GitLab) o <em>step</em> con <code>trigger: manual</code> (Bitbucket).</td></tr>
+    <tr><td class="crit">Repositorio desnudo local como remoto</td><td>Repositorio alojado en GitLab.com o Bitbucket.org, con autenticación por SSH o token.</td></tr>
+    <tr><td class="crit">Etiqueta <code>v1.0.0</code></td><td>Etiqueta del proyecto y, en GitLab, posibilidad de crear una «Release» formal.</td></tr>
+  </tbody>
+</table>
+
+<div class="foot">
+  Informe elaborado el 24 de octubre de 2026 · GitLab frente a Bitbucket · Leonardo Meza · Ingeniería de Sistemas,
+  Universidad de la Costa. Las marcas GitLab y Bitbucket pertenecen a sus respectivos titulares.
+</div>
+
+</body>
+</html>

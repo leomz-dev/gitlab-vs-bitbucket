@@ -1,0 +1,2 @@
+# NotasApp no requiere dependencias externas: usa solo la biblioteca estándar.
+# El archivo existe para habilitar el cacheo de dependencias en los pipelines.

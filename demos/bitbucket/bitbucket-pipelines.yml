@@ -1,0 +1,67 @@
+# bitbucket-pipelines.yml - Pipeline CI/CD de Bitbucket para NotasApp (demostración)
+# Documentación: https://support.atlassian.com/bitbucket-cloud/docs/configure-bitbucket-pipelinesyml/
+
+image: python:3.12-slim
+
+definitions:
+  caches:
+    pip-cache: /root/.cache/pip        # caché de dependencias reutilizable
+
+  steps:                               # steps reutilizables mediante anclas YAML (& / *)
+    - step: &build
+        name: Compilar
+        caches:
+          - pip-cache
+        script:
+          - python -m pip install --cache-dir /root/.cache/pip -r requirements.txt
+          - python -m compileall -q src/
+        artifacts:
+          - src/**
+
+    - step: &test
+        name: Pruebas unitarias
+        caches:
+          - pip-cache
+        script:
+          - python -m unittest discover -s tests -v
+        artifacts:
+          - tests/**
+
+    - step: &estilo
+        name: Revisión de estilo
+        caches:
+          - pip-cache
+        script:
+          - python -m pip install ruff
+          - ruff check src/
+
+pipelines:
+  # Se ejecuta en cualquier push que no coincida con una regla más específica
+  default:
+    - step: *build
+    - step: *test
+
+  # Pull Requests: además del build y las pruebas, exige revisión de estilo
+  pull-requests:
+    '**':
+      - step: *build
+      - step: *test
+      - step: *estilo
+
+  # Rama principal: incluye despliegues a los entornos
+  branches:
+    main:
+      - step: *build
+      - step: *test
+      - step: *estilo
+      - step:
+          name: Desplegar en Staging
+          deployment: staging
+          script:
+            - python scripts/deploy.py staging
+      - step:
+          name: Desplegar en Producción
+          deployment: production
+          trigger: manual            # requiere aprobación manual en la interfaz
+          script:
+            - python scripts/deploy.py production
